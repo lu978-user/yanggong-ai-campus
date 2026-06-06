@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 220 45% 98%;
+  --foreground: 224 41% 11%;
+  --border: 220 22% 86%;
+  --muted: 218 38% 94%;
+  --muted-foreground: 220 12% 42%;
+  --primary: 222 92% 56%;
+  --primary-foreground: 0 0% 100%;
+}
+
+.dark {
+  --background: 224 44% 7%;
+  --foreground: 215 45% 96%;
+  --border: 222 22% 18%;
+  --muted: 222 35% 13%;
+  --muted-foreground: 218 15% 70%;
+  --primary: 217 95% 66%;
+  --primary-foreground: 224 44% 7%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+}
+
+textarea,
+input,
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+  font: inherit;
+}
+
+.bg-page {
+  background:
+    radial-gradient(circle at top left, rgba(73, 132, 255, 0.22), transparent 34%),
+    radial-gradient(circle at 85% 10%, rgba(45, 212, 191, 0.18), transparent 28%),
+    linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+}
+
+.dark .bg-page {
+  background:
+    radial-gradient(circle at top left, rgba(60, 105, 255, 0.25), transparent 34%),
+    radial-gradient(circle at 85% 10%, rgba(20, 184, 166, 0.15), transparent 28%),
+    linear-gradient(180deg, hsl(var(--background)), #070b16);
+}
+
+::selection {
+  background: rgba(70, 124, 255, 0.24);
+}
+
+.glass {
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: 0 20px 60px rgba(22, 31, 59, 0.08);
+  backdrop-filter: blur(24px);
+  border-radius: 16px;
+}
+
+.dark .glass {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(13, 18, 34, 0.62);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
+}
+
+.noise {
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.3) 1px,
+    transparent 1px
+  );
+  background-size: 18px 18px;
+}
+
+.soft-card {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 18px 50px rgba(24, 36, 66, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.dark .soft-card {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.58);
+}

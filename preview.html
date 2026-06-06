@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>扬工智行 - AI校园公益服务助手</title>
+    <style>
+      :root {
+        --blue: #2563eb;
+        --sky: #38bdf8;
+        --green: #10b981;
+        --orange: #f97316;
+        --purple: #8b5cf6;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --line: rgba(37, 99, 235, 0.14);
+        --glass: rgba(255, 255, 255, 0.78);
+        --shadow: 0 24px 80px rgba(15, 23, 42, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        font-family:
+          "Microsoft YaHei", "PingFang SC", "Noto Sans SC", Inter, system-ui,
+          sans-serif;
+        background:
+          radial-gradient(circle at 8% 0%, rgba(37, 99, 235, 0.22), transparent 34%),
+          radial-gradient(circle at 90% 12%, rgba(56, 189, 248, 0.18), transparent 26%),
+          linear-gradient(180deg, #f8fbff, #eef6ff);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.38;
+        background-image:
+          linear-gradient(to right, rgba(59, 130, 246, 0.12) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(59, 130, 246, 0.12) 1px, transparent 1px);
+        background-size: 72px 72px;
+        mask-image: linear-gradient(to bottom, black, transparent 72%);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        padding: 24px;
+        border-right: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.76);
+        backdrop-filter: blur(24px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .brand-logo {
+        width: 52px;
+        height: 52px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: white;
+        object-fit: contain;
+        padding: 6px;
+        box-shadow: 0 12px 30px rgba(37, 99, 235, 0.12);
+      }
+
+      .brand strong {
+        display: block;
+        font-size: 19px;
+        font-weight: 900;
+      }
+
+      .brand span {
+        display: block;
+        margin-top: 3px;
+        color: var(--blue);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .nav {
+        display: grid;
+        gap: 10px;
+        margin-top: 36px;
+      }
+
+      .nav a {
+        padding: 13px 14px;
+        border-radius: 16px;
+        color: #475569;
+        font-size: 14px;
+        font-weight: 800;
+        transition: 0.2s ease;
+      }
+
+      .nav a.active,
+      .nav a:hover {
+        color: white;
+        background: linear-gradient(135deg, var(--blue), var(--sky));
+        box-shadow: 0 16px 38px rgba(37, 99, 235, 0.24);
+      }
+
+      .side-note {
+        position: absolute;
+        right: 24px;
+        bottom: 24px;
+        left: 24px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: rgba(239, 246, 255, 0.78);
+        color: #475569;
+        font-size: 13px;
+        line-height: 1.8;
+      }
+
+      main {
+        position: relative;
+        padding: 28px;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 36px;
+        align-items: center;
+        min-height: 430px;
+        padding: 38px;
+        border: 1px solid rgba(255, 255, 255, 0.74);
+        border-radius: 30px;
+        background: var(--glass);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(24px);
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        right: -90px;
+        top: -120px;
+        width: 420px;
+        height: 420px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(56, 189, 248, 0.1));
+        filter: blur(8px);
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 14px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #eff6ff;
+        color: var(--blue);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      h1 {
+        margin: 22px 0 0;
+        font-size: clamp(44px, 5vw, 74px);
+        line-height: 1;
+        letter-spacing: 0;
+      }
+
+      .subtitle {
+        margin: 16px 0 0;
+        color: var(--blue);
+        font-size: 22px;
+        font-weight: 900;
+      }
+
+      .school {
+        display: inline-flex;
+        margin-top: 20px;
+        padding: 12px 16px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(239, 246, 255, 0.78);
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .hero p {
+        max-width: 760px;
+        margin: 24px 0 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.9;
+      }
+
+      .hero-card {
+        position: relative;
+        z-index: 1;
+        padding: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.34);
+        border-radius: 28px;
+        color: white;
+        background: linear-gradient(135deg, #2563eb, #0ea5e9 58%, #22d3ee);
+        box-shadow: 0 26px 70px rgba(37, 99, 235, 0.28);
+      }
+
+      .hero-card h2 {
+        margin: 8px 0 18px;
+        font-size: 28px;
+      }
+
+      .hero-card .item {
+        padding: 15px 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.16);
+        font-weight: 900;
+      }
+
+      .stack {
+        display: grid;
+        gap: 12px;
+      }
+
+      .section {
+        margin-top: 28px;
+        padding: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.74);
+        border-radius: 30px;
+        background: var(--glass);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(24px);
+      }
+
+      .section-head {
+        margin-bottom: 20px;
+      }
+
+      .eyebrow {
+        color: var(--blue);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      h2 {
+        margin: 8px 0 0;
+        font-size: 30px;
+        letter-spacing: 0;
+      }
+
+      .service-grid,
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .service,
+      .feature {
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.82);
+        box-shadow: 0 12px 36px rgba(15, 23, 42, 0.06);
+        transition: 0.2s ease;
+      }
+
+      .service:hover,
+      .feature:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 22px 52px rgba(37, 99, 235, 0.14);
+      }
+
+      .icon {
+        display: grid;
+        place-items: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 17px;
+        background: #eff6ff;
+        font-size: 24px;
+      }
+
+      .service h3,
+      .feature h3 {
+        margin: 16px 0 8px;
+        font-size: 19px;
+      }
+
+      .service p,
+      .feature p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .btn {
+        display: inline-flex;
+        margin-top: 18px;
+        padding: 10px 15px;
+        border-radius: 999px;
+        color: white;
+        background: var(--blue);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .map-layout {
+        display: grid;
+        grid-template-columns: 65fr 35fr;
+        gap: 20px;
+      }
+
+      .map-panel,
+      .chat-panel {
+        border: 1px solid rgba(255, 255, 255, 0.74);
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.76);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(24px);
+      }
+
+      .map-panel {
+        padding: 16px;
+      }
+
+      .map-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+
+      .search {
+        display: flex;
+        flex: 1;
+        min-width: 280px;
+        gap: 10px;
+        align-items: center;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.86);
+      }
+
+      .search input {
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .layer-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .layer-tabs button,
+      .question {
+        cursor: pointer;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: white;
+        color: #475569;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 900;
+        padding: 9px 12px;
+        transition: 0.2s ease;
+      }
+
+      .layer-tabs button.active,
+      .question:hover {
+        color: white;
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--blue), var(--sky));
+      }
+
+      .map-frame {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: linear-gradient(135deg, #f0f9ff, #ecfdf5);
+      }
+
+      .map-img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: contain;
+      }
+
+      .hotspot {
+        position: absolute;
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        translate: -50% -50%;
+        cursor: pointer;
+        border: 2px solid white;
+        border-radius: 999px;
+        color: white;
+        box-shadow: 0 14px 34px rgba(15, 23, 42, 0.25);
+        transition: transform 0.25s ease, opacity 0.25s ease;
+      }
+
+      .hotspot:hover {
+        transform: scale(1.2);
+      }
+
+      .hotspot.active {
+        transform: scale(1.6);
+        animation: pulse 1s ease-in-out infinite;
+        z-index: 4;
+      }
+
+      .teaching { background: linear-gradient(135deg, #2563eb, #38bdf8); }
+      .life { background: linear-gradient(135deg, #10b981, #2dd4bf); }
+      .sport { background: linear-gradient(135deg, #f97316, #fbbf24); }
+      .landscape { background: linear-gradient(135deg, #8b5cf6, #d946ef); }
+      .gate { background: linear-gradient(135deg, #0891b2, #2563eb); }
+
+      @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.28); }
+        50% { box-shadow: 0 0 0 18px rgba(37, 99, 235, 0); }
+      }
+
+      .locating {
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        z-index: 5;
+        padding: 12px 15px;
+        border: 1px solid rgba(255, 255, 255, 0.74);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.86);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+        font-weight: 900;
+      }
+
+      .detail {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 16px;
+        margin-top: 16px;
+      }
+
+      .info-card,
+      .route-card {
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.74);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.82);
+        box-shadow: 0 14px 42px rgba(15, 23, 42, 0.08);
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .mini {
+        padding: 14px;
+        border-radius: 16px;
+        background: #eff6ff;
+      }
+
+      .mini b {
+        display: block;
+        color: var(--blue);
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+
+      .route-step {
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: #eff6ff;
+        font-weight: 900;
+      }
+
+      .down {
+        padding: 5px 14px;
+        color: var(--blue);
+        font-weight: 900;
+      }
+
+      .chat-panel {
+        display: flex;
+        flex-direction: column;
+        min-height: 760px;
+        overflow: hidden;
+      }
+
+      .chat-head,
+      .chat-quick,
+      .chat-form {
+        padding: 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .chat-quick {
+        display: grid;
+        gap: 9px;
+      }
+
+      .chat-body {
+        flex: 1;
+        padding: 18px;
+        overflow: auto;
+      }
+
+      .msg {
+        max-width: 82%;
+        margin-bottom: 12px;
+        padding: 13px 15px;
+        border-radius: 18px;
+        background: #eff6ff;
+        color: #334155;
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .msg.user {
+        margin-left: auto;
+        color: white;
+        background: var(--blue);
+      }
+
+      .chat-form {
+        display: flex;
+        gap: 10px;
+        border-bottom: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .chat-form input {
+        flex: 1;
+        padding: 13px 14px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        outline: 0;
+        font: inherit;
+      }
+
+      .send {
+        width: 46px;
+        border: 0;
+        border-radius: 999px;
+        color: white;
+        background: var(--blue);
+        font-size: 18px;
+      }
+
+      @media (max-width: 1100px) {
+        .shell { grid-template-columns: 1fr; }
+        .sidebar { position: relative; height: auto; }
+        .side-note { position: static; margin-top: 24px; }
+        .hero,
+        .map-layout,
+        .detail { grid-template-columns: 1fr; }
+        .service-grid,
+        .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+
+      @media (max-width: 720px) {
+        main { padding: 16px; }
+        .hero,
+        .section { padding: 20px; }
+        .service-grid,
+        .feature-grid,
+        .info-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <img class="brand-logo" src="public/logo.png" onerror="this.src='logo.png'" alt="扬工智行" />
+          <div>
+            <strong>扬工智行</strong>
+            <span>AI校园公益服务助手</span>
+          </div>
+        </div>
+        <nav class="nav">
+          <a class="active" href="#dashboard">首页 Dashboard</a>
+          <a href="#map">AI校园导览</a>
+          <a href="#features">项目特色</a>
+          <a href="#services">服务入口</a>
+        </nav>
+        <div class="side-note">
+          面向高校AI智能体比赛的现代校园公益服务平台展示预览。正式项目使用 Next.js + TypeScript + Tailwind CSS + Dify Chatflow API。
+        </div>
+      </aside>
+
+      <main>
+        <section id="dashboard" class="hero">
+          <div>
+            <div class="pill">✨ 现代校园服务平台 · AI公益服务展示作品</div>
+            <h1>扬工智行</h1>
+            <div class="subtitle">AI校园公益服务助手</div>
+            <div class="school">扬州工业职业技术学院 · YANGZHOU POLYTECHNIC INSTITUTE</div>
+            <p>
+              融合Dify智能体、校园知识库与地图热点定位，把校园导航、生活咨询、学习成长、安全关怀和学生事务整合为一个可展示、可交互、可扩展的校园公益服务平台。
+            </p>
+          </div>
+          <div class="hero-card">
+            <div class="pill" style="color:white;border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.14)">Campus AI Service</div>
+            <h2>一站式校园公益服务</h2>
+            <div class="stack">
+              <div class="item">AI问答理解</div>
+              <div class="item">地图热点定位</div>
+              <div class="item">校园服务分流</div>
+              <div class="item">公益关怀指引</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="services" class="section">
+          <div class="section-head">
+            <div class="eyebrow">服务入口</div>
+            <h2>六大校园公益服务</h2>
+          </div>
+          <div class="service-grid">
+            <article class="service"><div class="icon">📍</div><h3>校园导航</h3><p>快速定位校门、楼宇、食堂、宿舍和校园地标。</p><span class="btn">进入</span></article>
+            <article class="service"><div class="icon">🍜</div><h3>校园生活</h3><p>解答就餐、住宿、活动、服务设施等日常问题。</p><span class="btn">进入</span></article>
+            <article class="service"><div class="icon">🎯</div><h3>学习成长</h3><p>生成学习计划、竞赛路径和技能提升建议。</p><span class="btn">进入</span></article>
+            <article class="service"><div class="icon">🏫</div><h3>校园文化</h3><p>讲好校园地标、校史文化与工匠精神故事。</p><span class="btn">进入</span></article>
+            <article class="service"><div class="icon">🛡</div><h3>安全关怀</h3><p>提供反诈提醒、心理关怀和应急处理指引。</p><span class="btn">进入</span></article>
+            <article class="service"><div class="icon">📋</div><h3>学生事务</h3><p>梳理常见事务流程、材料清单和办理路径。</p><span class="btn">进入</span></article>
+          </div>
+        </section>
+
+        <section id="features" class="section">
+          <div class="section-head">
+            <div class="eyebrow">项目特色</div>
+            <h2>比赛展示亮点</h2>
+          </div>
+          <div class="feature-grid">
+            <article class="feature"><div class="icon">🤖</div><h3>AI智能问答</h3><p>接入Dify Chatflow，承接校园多意图问题。</p></article>
+            <article class="feature"><div class="icon">🗺</div><h3>校园地图导览</h3><p>AI返回地图ID后自动高亮校园热点。</p></article>
+            <article class="feature"><div class="icon">📚</div><h3>学习成长规划</h3><p>围绕学习、竞赛、证书和职业发展给出建议。</p></article>
+            <article class="feature"><div class="icon">🧡</div><h3>反诈与心理关怀</h3><p>提供安全提醒与校园公益关怀入口。</p></article>
+            <article class="feature"><div class="icon">📋</div><h3>学生事务办理指引</h3><p>帮助学生理解流程、材料与办理路径。</p></article>
+            <article class="feature"><div class="icon">🏛</div><h3>工匠精神文化传播</h3><p>把校园文化与职业教育特色融入AI导览。</p></article>
+          </div>
+        </section>
+
+        <section id="map" class="section">
+          <div class="section-head">
+            <div class="eyebrow">AI Campus Navigation</div>
+            <h2>AI智慧校园导览 <span class="pill" style="margin-left:12px;color:#047857;background:#ecfdf5">📡 系统在线</span></h2>
+            <p style="color:var(--muted);line-height:1.8">基于Dify智能体与校园知识库，实现校园地点查询、地图定位、学习服务与公益信息导览。</p>
+          </div>
+
+          <div class="map-layout">
+            <div>
+              <div class="map-panel">
+                <div class="map-toolbar">
+                  <form class="search" onsubmit="searchPlace(event)">
+                    🔎
+                    <input id="searchInput" placeholder="搜索图书馆、体育馆、东门..." />
+                    <button class="btn" style="border:0;margin:0">定位</button>
+                  </form>
+                  <div class="layer-tabs" id="layerTabs"></div>
+                </div>
+                <div class="map-frame">
+                  <img class="map-img" src="public/campus-map.png" onerror="this.src='campus-map.png'" alt="校园地图" />
+                  <div id="hotspots"></div>
+                  <div id="locating" class="locating">📍 已定位：<br /><span>图书馆（文筑馆）</span></div>
+                </div>
+              </div>
+              <div class="detail">
+                <div class="info-card">
+                  <div class="eyebrow">📍 建筑名称</div>
+                  <h2 id="placeTitle">图书馆（文筑馆）</h2>
+                  <div class="info-grid">
+                    <div class="mini"><b>位置说明</b><span id="placeLocation">位于校园北部核心学习区，靠近文峰楼、文汇楼与运动场。</span></div>
+                    <div class="mini"><b>主要功能</b><span id="placeFunction">自习、借阅、资料检索、学习研讨与校园知识服务。</span></div>
+                    <div class="mini"><b>附近建筑</b><span id="placeNearby">文峰楼、文汇楼、运动场、学生宿舍区</span></div>
+                    <div class="mini"><b>状态</b><span>已定位</span></div>
+                  </div>
+                  <span class="btn">🧭 导航到这里</span>
+                </div>
+                <div class="route-card">
+                  <h3>🚶 推荐路线</h3>
+                  <div id="routeSteps"></div>
+                  <div class="mini" style="margin-top:14px"><b>预计步行</b><span id="walkTime">3分钟</span></div>
+                </div>
+              </div>
+            </div>
+
+            <aside class="chat-panel">
+              <div class="chat-head">
+                <h3 style="margin:0">🤖 AI地图导览</h3>
+                <p style="margin:6px 0 0;color:var(--muted);font-size:13px">Dify Chatflow API · 地图ID联动</p>
+              </div>
+              <div class="chat-quick">
+                <b style="font-size:13px;color:var(--muted)">推荐提问</b>
+                <button class="question" onclick="ask('图书馆在哪')">📍 图书馆在哪</button>
+                <button class="question" onclick="ask('东门在哪')">📍 东门在哪</button>
+                <button class="question" onclick="ask('体育馆在哪')">📍 体育馆在哪</button>
+                <button class="question" onclick="ask('双镜湖在哪')">📍 双镜湖在哪</button>
+                <button class="question" onclick="ask('大学生活动中心在哪')">📍 大学生活动中心在哪</button>
+              </div>
+              <div class="chat-body" id="chatBody">
+                <div class="msg">你好，我是扬工智行地图导览助手。你可以询问校园地点，我会根据地图ID自动高亮地图热点。</div>
+              </div>
+              <form class="chat-form" onsubmit="chatSubmit(event)">
+                <input id="chatInput" placeholder="输入地点问题，例如：图书馆在哪" />
+                <button class="send">➤</button>
+              </form>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const places = [
+        { id: "library", name: "图书馆（文筑馆）", icon: "📚", layer: "teaching", x: 48, y: 38, words: ["图书馆", "文筑馆", "library"], location: "位于校园北部核心学习区，靠近文峰楼、文汇楼与运动场。", fn: "自习、借阅、资料检索、学习研讨与校园知识服务。", nearby: "文峰楼、文汇楼、运动场、学生宿舍区", route: ["北门", "春江路", "文筑馆"], time: "3分钟" },
+        { id: "east_gate", name: "东门", icon: "🚪", layer: "gate", x: 88, y: 53, words: ["东门", "east_gate"], location: "位于校园东侧，连接校外道路与东侧生活区。", fn: "校园出入口、访客到达、校外通勤定位。", nearby: "丁香园、学生宿舍区、文筑馆", route: ["东门", "主干道", "文筑馆"], time: "6分钟" },
+        { id: "north_gate", name: "北门", icon: "🚪", layer: "gate", x: 50, y: 9, words: ["北门", "north_gate"], location: "位于校园北侧，靠近停车场与主要教学楼区域。", fn: "校园北侧出入口、教学区到达、访客定位。", nearby: "停车场、文汇楼、高桥楼", route: ["北门", "停车场", "文汇楼"], time: "5分钟" },
+        { id: "west_gate", name: "西门", icon: "🚪", layer: "gate", x: 10, y: 54, words: ["西门", "west_gate"], location: "位于校园西侧，靠近运动场与西侧宿舍区域。", fn: "校园出入口、生活服务、校外交通衔接。", nearby: "运动场、体育馆、古津楼", route: ["西门", "运动场", "体育馆"], time: "4分钟" },
+        { id: "sports_hall", name: "体育馆", icon: "⚽", layer: "sport", x: 28, y: 72, words: ["体育馆", "sports_hall"], location: "位于校园南部运动区域，靠近篮球场与运动场。", fn: "体育教学、运动训练、社团活动和赛事组织。", nearby: "篮球场、运动场、实训基地", route: ["北门", "明月路", "体育馆"], time: "8分钟" },
+        { id: "canteen", name: "食堂区域", icon: "🍜", layer: "life", x: 63, y: 66, words: ["食堂", "餐厅", "canteen"], location: "分布在宿舍与活动区域附近，便于学生日常就餐。", fn: "学生就餐、生活补给、校园生活服务。", nearby: "大学生活动中心、宿舍区、湖畔园", route: ["北门", "文汇楼", "湖畔园"], time: "7分钟" },
+        { id: "shuangjing_lake", name: "双镜湖", icon: "🌊", layer: "landscape", x: 44, y: 57, words: ["双镜湖", "湖", "shuangjing_lake"], location: "位于校园中东部景观带，靠近大学生活动中心。", fn: "休闲散步、校园文化展示、拍照打卡和景观导览。", nearby: "大学生活动中心、湖畔园、高桥楼", route: ["北门", "明月路", "双镜湖"], time: "6分钟" },
+        { id: "activity_center", name: "大学生活动中心", icon: "🎭", layer: "life", x: 56, y: 49, words: ["活动中心", "大学生活动中心", "activity_center"], location: "位于双镜湖附近，是校园文化活动的重要场地。", fn: "社团活动、学生组织、公益活动、校园展示。", nearby: "双镜湖、湖畔园、文汇楼", route: ["北门", "文汇楼", "大学生活动中心"], time: "7分钟" },
+        { id: "dorm_east", name: "东侧学生宿舍区", icon: "🏠", layer: "life", x: 76, y: 76, words: ["东侧宿舍", "宿舍", "dorm_east"], location: "位于校园东侧生活片区，靠近东门和生活服务设施。", fn: "学生住宿、生活服务、夜间安全关怀。", nearby: "东门、食堂区域、活动中心", route: ["东门", "学生宿舍区", "食堂区域"], time: "4分钟" },
+        { id: "dorm_west", name: "西侧学生宿舍区", icon: "🏠", layer: "life", x: 21, y: 78, words: ["西侧宿舍", "宿舍", "dorm_west"], location: "位于校园西侧生活片区，靠近运动场和体育馆。", fn: "学生住宿、生活服务、日常返寝路线提示。", nearby: "体育馆、运动场、西门", route: ["西门", "运动场", "西侧宿舍区"], time: "5分钟" },
+        { id: "training_base", name: "实训基地", icon: "🏫", layer: "teaching", x: 72, y: 31, words: ["实训基地", "training_base"], location: "位于校园南侧实践教学区域。", fn: "技能训练、实践教学、项目实作和工匠精神培养。", nearby: "体育馆、运动场、高桥楼", route: ["北门", "明月路", "实训基地"], time: "9分钟" },
+        { id: "wenhui", name: "文汇楼", icon: "🏫", layer: "teaching", x: 36, y: 29, words: ["文汇楼", "wenhui"], location: "位于校园中部教学区，靠近双镜湖和大学生活动中心。", fn: "日常教学、公共课程、课堂学习。", nearby: "双镜湖、大学生活动中心、高桥楼", route: ["北门", "文汇楼"], time: "5分钟" },
+        { id: "wenfeng", name: "文峰楼", icon: "🏫", layer: "teaching", x: 42, y: 27, words: ["文峰楼", "wenfeng"], location: "位于校园西北教学区，靠近图书馆和华扬楼。", fn: "课程教学、教室导航、教学服务。", nearby: "图书馆、华扬楼、运动场", route: ["北门", "春江路", "文峰楼"], time: "6分钟" },
+        { id: "zhenzhou", name: "真州楼", icon: "🏫", layer: "teaching", x: 55, y: 27, words: ["真州楼", "zhenzhou"], location: "位于校园中部教学区，周边连通多条主干道。", fn: "课程教学、学生事务咨询、教学管理服务。", nearby: "文汇楼、高桥楼、双镜湖", route: ["北门", "明月路", "真州楼"], time: "6分钟" },
+        { id: "gaoqiao", name: "高桥楼", icon: "🏫", layer: "teaching", x: 62, y: 27, words: ["高桥楼", "gaoqiao"], location: "位于双镜湖南侧，靠近实训基地与体育馆。", fn: "课程教学、教学服务、实践学习衔接。", nearby: "双镜湖、体育馆、实训基地", route: ["北门", "明月路", "高桥楼"], time: "7分钟" }
+      ];
+
+      const layerLabels = { all: "全部", teaching: "教学楼", life: "生活服务", sport: "运动场馆", landscape: "景观区域", gate: "校门" };
+      let activeId = "library";
+      let activeLayer = "all";
+
+      function renderLayers() {
+        const box = document.getElementById("layerTabs");
+        box.innerHTML = Object.entries(layerLabels).map(([id, label]) => `<button class="${id === activeLayer ? "active" : ""}" onclick="setLayer('${id}')">${label}</button>`).join("");
+      }
+
+      function renderHotspots() {
+        const box = document.getElementById("hotspots");
+        box.innerHTML = places
+          .filter((p) => activeLayer === "all" || p.layer === activeLayer)
+          .map((p) => `<button class="hotspot ${p.layer} ${p.id === activeId ? "active" : ""}" style="left:${p.x}%;top:${p.y}%" onclick="locate('${p.id}')" title="${p.name}">${p.icon}</button>`)
+          .join("");
+      }
+
+      function locate(id) {
+        const p = places.find((item) => item.id === id) || places[0];
+        activeId = p.id;
+        document.getElementById("placeTitle").textContent = p.name;
+        document.getElementById("placeLocation").textContent = p.location;
+        document.getElementById("placeFunction").textContent = p.fn;
+        document.getElementById("placeNearby").textContent = p.nearby;
+        document.getElementById("walkTime").textContent = p.time;
+        document.getElementById("routeSteps").innerHTML = p.route.map((step, i) => `<div class="route-step">${step}</div>${i < p.route.length - 1 ? '<div class="down">↓</div>' : ''}`).join("");
+        document.getElementById("locating").innerHTML = `📍 已定位：<br /><span>${p.name}</span>`;
+        renderHotspots();
+      }
+
+      function setLayer(id) {
+        activeLayer = id;
+        renderLayers();
+        renderHotspots();
+      }
+
+      function searchPlace(event) {
+        event.preventDefault();
+        const value = document.getElementById("searchInput").value.trim().toLowerCase();
+        const found = places.find((p) => p.words.some((w) => w.toLowerCase().includes(value)) || p.name.toLowerCase().includes(value));
+        if (found) locate(found.id);
+      }
+
+      function ask(text) {
+        const chat = document.getElementById("chatBody");
+        chat.insertAdjacentHTML("beforeend", `<div class="msg user">${text}</div>`);
+        const found = places.find((p) => p.words.some((w) => text.includes(w.replace("_", ""))) || text.includes(p.name.replace("（文筑馆）", "")));
+        const p = found || places[0];
+        locate(p.id);
+        chat.insertAdjacentHTML("beforeend", `<div class="msg">已为你定位：${p.name}<br />地图ID：${p.id}</div>`);
+        chat.scrollTop = chat.scrollHeight;
+      }
+
+      function chatSubmit(event) {
+        event.preventDefault();
+        const input = document.getElementById("chatInput");
+        if (!input.value.trim()) return;
+        ask(input.value.trim());
+        input.value = "";
+      }
+
+      renderLayers();
+      locate("library");
+    </script>
+  </body>
+</html>
