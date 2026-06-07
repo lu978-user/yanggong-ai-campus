@@ -335,7 +335,7 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
         </div>
 
         <div className="relative overflow-hidden rounded-[24px] border border-blue-100 bg-gradient-to-br from-sky-50 via-white to-emerald-50 shadow-inner">
-          <div className="relative aspect-[4/3] w-full">
+          <div className="relative aspect-[16/9] w-full">
             <Image
               src="/campus-map.png"
               alt="校园地图"
