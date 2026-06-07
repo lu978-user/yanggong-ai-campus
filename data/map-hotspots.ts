@@ -24,11 +24,13 @@ export type MapHotspot = {
   y: number;
   category: "gate" | "study" | "life" | "sport" | "landscape" | "activity" | "teaching" | "dorm";
   keywords: string[];
+  amapKeyword?: string;
 };
 
 export const mapHotspots: MapHotspot[] = [
   {
     id: "library",
+    amapKeyword: "扬州工业职业技术学院 图书馆",
     name: "图书馆/文筑馆",
     alias: ["图书馆", "文筑馆", "文筑楼"],
     description: "校园学习与资料检索核心空间，适合自习、借阅和信息查询。",
@@ -39,6 +41,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "east_gate",
+    amapKeyword: "扬州工业职业技术学院 东门",
     name: "东门",
     alias: ["学校东门", "东大门"],
     description: "校园东侧主要出入口，常用于校外通勤与访客到达。",
@@ -49,6 +52,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "west_gate",
+    amapKeyword: "扬州工业职业技术学院 西门",
     name: "西门",
     alias: ["学校西门", "西大门"],
     description: "校园西侧出入口，连接周边生活服务区。",
@@ -59,6 +63,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "north_gate",
+    amapKeyword: "扬州工业职业技术学院 北门",
     name: "北门",
     alias: ["学校北门", "北大门"],
     description: "校园北侧出入口，适合定位北侧教学与生活区域。",
@@ -69,6 +74,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "sports_hall",
+    amapKeyword: "扬州工业职业技术学院 体育馆",
     name: "体育馆",
     alias: ["体育中心", "运动馆"],
     description: "体育课程、运动训练和大型活动常用场地。",
@@ -79,6 +85,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "canteen",
+    amapKeyword: "扬州工业职业技术学院 食堂",
     name: "食堂区域",
     alias: ["食堂", "餐厅", "学生餐厅"],
     description: "学生日常就餐区域，可结合高峰时间给出就餐建议。",
@@ -89,6 +96,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "shuangjing_lake",
+    amapKeyword: "扬州工业职业技术学院 双镜湖",
     name: "双镜湖",
     alias: ["双镜湖", "湖区", "校园湖"],
     description: "校园景观与休闲区域，适合散步、拍照和校园文化导览。",
@@ -99,6 +107,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "activity_center",
+    amapKeyword: "扬州工业职业技术学院 大学生活动中心",
     name: "大学生活动中心",
     alias: ["学生活动中心", "活动中心", "大学生活动中心"],
     description: "社团活动、学生组织和校园公益活动的重要空间。",
@@ -109,6 +118,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "dorm_east",
+    amapKeyword: "扬州工业职业技术学院 东侧学生宿舍区",
     name: "东侧学生宿舍区",
     alias: ["东宿舍", "东侧宿舍", "东区宿舍"],
     description: "东侧学生住宿区域，可用于生活服务与夜间返寝路线提示。",
@@ -119,6 +129,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "dorm_west",
+    amapKeyword: "扬州工业职业技术学院 西侧学生宿舍区",
     name: "西侧学生宿舍区",
     alias: ["西宿舍", "西侧宿舍", "西区宿舍"],
     description: "西侧学生住宿区域，适合关联生活服务和安全关怀场景。",
@@ -129,6 +140,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "training_base",
+    amapKeyword: "扬州工业职业技术学院 实训基地",
     name: "实训基地",
     alias: ["实训楼", "训练基地", "实践基地"],
     description: "实践教学、技能训练和项目实作相关区域。",
@@ -139,6 +151,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "wenhui",
+    amapKeyword: "扬州工业职业技术学院 文汇楼",
     name: "文汇楼",
     alias: ["文汇", "文汇教学楼"],
     description: "教学与公共课程相关楼宇，后续可接入课表与教室导航。",
@@ -149,6 +162,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "wenfeng",
+    amapKeyword: "扬州工业职业技术学院 文峰楼",
     name: "文峰楼",
     alias: ["文峰", "文峰教学楼"],
     description: "校园教学楼宇之一，可用于上课路线与楼宇查询。",
@@ -159,6 +173,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "zhenzhou",
+    amapKeyword: "扬州工业职业技术学院 真州楼",
     name: "真州楼",
     alias: ["真州", "真州教学楼"],
     description: "校园教学楼宇之一，支持按楼名进行导览高亮。",
@@ -169,6 +184,7 @@ export const mapHotspots: MapHotspot[] = [
   },
   {
     id: "gaoqiao",
+    amapKeyword: "扬州工业职业技术学院 高桥楼",
     name: "高桥楼",
     alias: ["高桥", "高桥教学楼"],
     description: "校园教学楼宇之一，可作为学生事务与教学服务地点。",

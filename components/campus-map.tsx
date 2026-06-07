@@ -2,8 +2,9 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { Navigation, Search } from "lucide-react";
+import { ExternalLink, Navigation, Search } from "lucide-react";
 import { mapHotspots, type MapHotspot, type MapHotspotId } from "@/data/map-hotspots";
+import { getAmapSearchUrl } from "@/lib/amap-link";
 import { cn } from "@/lib/utils";
 
 type CampusMapProps = {
@@ -264,6 +265,9 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
     mapHotspots.find((hotspot) => hotspot.id === activeMapId) ?? mapHotspots[0];
   const activeMeta = hotspotMeta[activeHotspot.id];
   const activeCategory = getDisplayCategory(activeHotspot);
+  const amapKeyword =
+    activeHotspot.amapKeyword ?? `扬州工业职业技术学院 ${activeHotspot.name}`;
+  const amapUrl = getAmapSearchUrl(amapKeyword);
 
   const visibleHotspots = useMemo(
     () =>
@@ -286,6 +290,10 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
       setLayer("all");
       onSelect(hotspot.id);
     }
+  }
+
+  function handleOpenAmap() {
+    window.open(amapUrl, "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -415,13 +423,23 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
             ))}
           </div>
 
-          <button
-            type="button"
-            className="mt-5 inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-glow transition hover:bg-blue-700"
-          >
-            <Navigation className="size-4" />
-            导航到这里
-          </button>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-glow transition hover:bg-blue-700"
+            >
+              <Navigation className="size-4" />
+              导航到这里
+            </button>
+            <button
+              type="button"
+              onClick={handleOpenAmap}
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 px-5 py-3 text-sm font-bold text-white shadow-glow transition hover:-translate-y-0.5 hover:shadow-xl"
+            >
+              <ExternalLink className="size-4" />
+              打开高德地图
+            </button>
+          </div>
         </section>
 
         {routeMeta && (
