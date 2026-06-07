@@ -32,6 +32,7 @@ export type MapHotspot = {
   category: "gate" | "study" | "life" | "sport" | "landscape" | "activity" | "teaching" | "dorm";
   keywords: string[];
   amapKeyword?: string;
+  baiduKeyword?: string;
 };
 
 const schoolName = "扬州工业职业技术学院";
@@ -47,6 +48,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "gate",
     keywords: ["west_gate", "西门", "西大门", "校门", "入口"],
     amapKeyword: `${schoolName} 西门`,
+    baiduKeyword: `${schoolName} 西门`,
   },
   {
     id: "huayang_building",
@@ -58,6 +60,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "teaching",
     keywords: ["huayang_building", "华阳楼", "华阳", "教学楼"],
     amapKeyword: `${schoolName} 华阳楼`,
+    baiduKeyword: `${schoolName} 华阳楼`,
   },
   {
     id: "dingxiang_garden",
@@ -69,6 +72,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "landscape",
     keywords: ["dingxiang_garden", "丁香园", "景观", "花园"],
     amapKeyword: `${schoolName} 丁香园`,
+    baiduKeyword: `${schoolName} 丁香园`,
   },
   {
     id: "yuntai_building",
@@ -80,6 +84,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "teaching",
     keywords: ["yuntai_building", "芸台楼", "芸台", "教学楼"],
     amapKeyword: `${schoolName} 芸台楼`,
+    baiduKeyword: `${schoolName} 芸台楼`,
   },
   {
     id: "wenfeng_building",
@@ -91,6 +96,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "teaching",
     keywords: ["wenfeng_building", "文峰楼", "文峰", "教学楼"],
     amapKeyword: `${schoolName} 文峰楼`,
+    baiduKeyword: `${schoolName} 文峰楼`,
   },
   {
     id: "weiyang_building",
@@ -102,6 +108,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "teaching",
     keywords: ["weiyang_building", "维扬楼", "维扬", "教学楼"],
     amapKeyword: `${schoolName} 维扬楼`,
+    baiduKeyword: `${schoolName} 维扬楼`,
   },
   {
     id: "zhuqing_courtyard",
@@ -113,6 +120,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "dorm",
     keywords: ["zhuqing_courtyard", "竹青院", "西区学生宿舍", "西区宿舍", "宿舍"],
     amapKeyword: `${schoolName} 竹青院`,
+    baiduKeyword: `${schoolName} 竹青院`,
   },
   {
     id: "wenzhu_building",
@@ -124,6 +132,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "teaching",
     keywords: ["wenzhu_building", "文筑楼", "文筑", "实训中心", "实训"],
     amapKeyword: `${schoolName} 文筑楼`,
+    baiduKeyword: `${schoolName} 文筑楼`,
   },
   {
     id: "east_playground",
@@ -135,6 +144,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "sport",
     keywords: ["east_playground", "东操场", "东运动场", "操场", "运动场"],
     amapKeyword: `${schoolName} 东操场`,
+    baiduKeyword: `${schoolName} 东操场`,
   },
   {
     id: "ziqing_building",
@@ -146,6 +156,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "teaching",
     keywords: ["ziqing_building", "自清楼", "自清", "教学楼"],
     amapKeyword: `${schoolName} 自清楼`,
+    baiduKeyword: `${schoolName} 自清楼`,
   },
   {
     id: "zhenzhou_building",
@@ -157,6 +168,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "teaching",
     keywords: ["zhenzhou_building", "真州楼", "真州", "教学楼"],
     amapKeyword: `${schoolName} 真州楼`,
+    baiduKeyword: `${schoolName} 真州楼`,
   },
   {
     id: "wenhui_building",
@@ -168,6 +180,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "study",
     keywords: ["wenhui_building", "文汇楼", "图书馆", "借书", "自习", "学习空间"],
     amapKeyword: `${schoolName} 文汇楼 图书馆`,
+    baiduKeyword: `${schoolName} 文汇楼 图书馆`,
   },
   {
     id: "gaoqiao_building",
@@ -179,6 +192,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "teaching",
     keywords: ["gaoqiao_building", "高桥楼", "高桥", "教学楼"],
     amapKeyword: `${schoolName} 高桥楼`,
+    baiduKeyword: `${schoolName} 高桥楼`,
   },
   {
     id: "north_gate",
@@ -190,6 +204,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "gate",
     keywords: ["north_gate", "北门", "北大门", "校门", "入口"],
     amapKeyword: `${schoolName} 北门`,
+    baiduKeyword: `${schoolName} 北门`,
   },
   {
     id: "sports_hall",
@@ -201,6 +216,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "sport",
     keywords: ["sports_hall", "体育馆", "运动", "体育课"],
     amapKeyword: `${schoolName} 体育馆`,
+    baiduKeyword: `${schoolName} 体育馆`,
   },
   {
     id: "erfen_bridge",
@@ -212,6 +228,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "landscape",
     keywords: ["erfen_bridge", "二分桥", "桥", "景观"],
     amapKeyword: `${schoolName} 二分桥`,
+    baiduKeyword: `${schoolName} 二分桥`,
   },
   {
     id: "shuangjing_lake",
@@ -223,6 +240,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "landscape",
     keywords: ["shuangjing_lake", "双镜湖", "湖", "景观"],
     amapKeyword: `${schoolName} 双镜湖`,
+    baiduKeyword: `${schoolName} 双镜湖`,
   },
   {
     id: "activity_center",
@@ -234,6 +252,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "activity",
     keywords: ["activity_center", "大学生活动中心", "活动中心", "社团", "学生会"],
     amapKeyword: `${schoolName} 大学生活动中心`,
+    baiduKeyword: `${schoolName} 大学生活动中心`,
   },
   {
     id: "qinchun_garden",
@@ -245,6 +264,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "landscape",
     keywords: ["qinchun_garden", "沁春园", "景观", "花园"],
     amapKeyword: `${schoolName} 沁春园`,
+    baiduKeyword: `${schoolName} 沁春园`,
   },
   {
     id: "hupan_garden",
@@ -256,6 +276,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "landscape",
     keywords: ["hupan_garden", "湖畔园", "湖畔", "景观"],
     amapKeyword: `${schoolName} 湖畔园`,
+    baiduKeyword: `${schoolName} 湖畔园`,
   },
   {
     id: "west_playground",
@@ -267,6 +288,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "sport",
     keywords: ["west_playground", "西操场", "西运动场", "操场", "运动场"],
     amapKeyword: `${schoolName} 西操场`,
+    baiduKeyword: `${schoolName} 西操场`,
   },
   {
     id: "meixiang_garden",
@@ -278,6 +300,7 @@ export const mapHotspots: MapHotspot[] = [
     category: "dorm",
     keywords: ["meixiang_garden", "梅香园", "西区学生宿舍", "西区宿舍", "宿舍"],
     amapKeyword: `${schoolName} 梅香园`,
+    baiduKeyword: `${schoolName} 梅香园`,
   },
 ];
 

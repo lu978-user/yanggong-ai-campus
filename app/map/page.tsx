@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import { Bike, Clock, Flame, MapPin, RadioTower, Route, UsersRound } from "lucide-react";
+import { Clock, Flame, MapPin, RadioTower, UsersRound } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { CampusMap } from "@/components/campus-map";
 import { MapChatPanel } from "@/components/map-chat-panel";
@@ -67,25 +67,7 @@ export default function MapPage() {
               onSelect={setActiveMapId}
             />
 
-            <section className="grid gap-4 lg:grid-cols-[360px_1fr]">
-              <div className="rounded-[24px] border border-white/70 bg-white/80 p-5 shadow-xl backdrop-blur-2xl">
-                <div className="mb-4 flex items-center gap-3">
-                  <span className="grid size-12 place-items-center rounded-2xl bg-blue-600 text-white">
-                    <Route className="size-6" />
-                  </span>
-                  <div>
-                    <p className="text-sm font-black text-blue-600">路线规划模块</p>
-                    <h2 className="text-xl font-black text-slate-950">从北门到目标地点</h2>
-                  </div>
-                </div>
-                <div className="grid gap-3 text-sm">
-                  <RouteLine label="当前位置" value="北门" />
-                  <RouteLine label="目标地点" value={activeHotspot.name} />
-                  <RouteLine label="预计步行" value={routeMapId ? "3-8分钟" : "选择地点后生成"} />
-                  <RouteLine label="预计骑行" value={routeMapId ? "2-5分钟" : "选择地点后生成"} icon={Bike} />
-                </div>
-              </div>
-
+            <section>
               <div className="rounded-[24px] border border-white/70 bg-white/80 p-5 shadow-xl backdrop-blur-2xl">
                 <p className="text-sm font-black text-blue-600">Building Preview</p>
                 <h2 className="mt-1 text-2xl font-black text-slate-950">建筑实景展示</h2>
@@ -153,26 +135,6 @@ function InfoPill({
       <Icon className="size-4" />
       <span className="text-slate-500">{label}</span>
       <span className="text-current">{value}</span>
-    </div>
-  );
-}
-
-function RouteLine({
-  label,
-  value,
-  icon: Icon,
-}: {
-  label: string;
-  value: string;
-  icon?: LucideIcon;
-}) {
-  return (
-    <div className="flex items-center justify-between rounded-2xl bg-blue-50/55 px-4 py-3">
-      <span className="font-bold text-slate-500">{label}</span>
-      <span className="inline-flex items-center gap-2 font-black text-slate-950">
-        {Icon && <Icon className="size-4 text-blue-600" />}
-        {value}
-      </span>
     </div>
   );
 }

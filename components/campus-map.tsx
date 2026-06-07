@@ -2,10 +2,10 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { ExternalLink, Navigation, Search } from "lucide-react";
+import { ExternalLink, MapPin, Navigation, Route, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { mapHotspots, type MapHotspot, type MapHotspotId } from "@/data/map-hotspots";
-import { getAmapSearchUrl } from "@/lib/amap-link";
+import { getAmapSearchUrl, getBaiduMapSearchUrl } from "@/lib/map-links";
 import { cn } from "@/lib/utils";
 
 type CampusMapProps = {
@@ -152,13 +152,21 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
     return () => window.clearTimeout(timer);
   }, [activeMapId]);
 
-  const activeHotspot =
-    mapHotspots.find((hotspot) => hotspot.id === activeMapId) ?? mapHotspots[0];
+  const selectedHotspot = activeMapId
+    ? mapHotspots.find((hotspot) => hotspot.id === activeMapId) ?? null
+    : null;
+  const activeHotspot = selectedHotspot ?? mapHotspots[0];
+  const hasSelectedHotspot = Boolean(selectedHotspot);
   const activeMeta = hotspotMeta[activeHotspot.id];
   const activeCategory = getDisplayCategory(activeHotspot);
   const amapKeyword =
     activeHotspot.amapKeyword ?? `扬州工业职业技术学院 ${activeHotspot.name}`;
+  const baiduKeyword =
+    activeHotspot.baiduKeyword ??
+    activeHotspot.amapKeyword ??
+    `扬州工业职业技术学院 ${activeHotspot.name}`;
   const amapUrl = getAmapSearchUrl(amapKeyword);
+  const baiduMapUrl = getBaiduMapSearchUrl(baiduKeyword);
 
   const visibleHotspots = useMemo(
     () =>
@@ -170,9 +178,9 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
   );
 
   const routeHotspot = routeMapId
-    ? mapHotspots.find((hotspot) => hotspot.id === routeMapId)
-    : null;
-  const routeMeta = routeHotspot ? hotspotMeta[routeHotspot.id] : null;
+    ? mapHotspots.find((hotspot) => hotspot.id === routeMapId) ?? activeHotspot
+    : activeHotspot;
+  const routeMeta = hotspotMeta[routeHotspot.id];
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -184,7 +192,13 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
   }
 
   function handleOpenAmap() {
+    if (!hasSelectedHotspot) return;
     window.open(amapUrl, "_blank", "noopener,noreferrer");
+  }
+
+  function handleOpenBaiduMap() {
+    if (!hasSelectedHotspot) return;
+    window.open(baiduMapUrl, "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -333,42 +347,80 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
             ))}
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-3">
-            <button
-              type="button"
-              className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-glow transition hover:bg-blue-700 active:scale-95"
-            >
-              <Navigation className="size-4" />
-              导航到这里
-            </button>
-            <button
-              type="button"
-              onClick={handleOpenAmap}
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 px-5 py-3 text-sm font-bold text-white shadow-glow transition hover:-translate-y-0.5 hover:shadow-xl active:scale-95"
-            >
-              <ExternalLink className="size-4" />
-              打开高德地图
-            </button>
-          </div>
         </motion.section>
 
         {routeMeta && (
-          <section className="rounded-[20px] border border-white/70 bg-gradient-to-br from-white/86 to-blue-50/76 p-5 shadow-card-light backdrop-blur-2xl">
-            <p className="text-sm font-black text-slate-950">🚶 推荐路线</p>
-            <div className="mt-5 space-y-2">
-              {routeMeta.route.map((step, index) => (
-                <div key={`${step}-${index}`}>
-                  <div className="rounded-2xl border border-blue-100 bg-white/78 px-4 py-3 text-sm font-bold text-slate-800">
-                    {step}
-                  </div>
-                  {index < routeMeta.route.length - 1 && (
-                    <div className="px-4 py-1 text-blue-500">↓</div>
-                  )}
-                </div>
-              ))}
+          <section className="rounded-[20px] border border-white/70 bg-gradient-to-br from-sky-50/90 via-white/86 to-cyan-50/82 p-5 shadow-card-light backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+            <div className="flex items-start gap-3">
+              <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-glow">
+                <Route className="size-5" />
+              </div>
+              <div>
+                <p className="text-base font-black text-slate-950">路线与外部导航</p>
+                <p className="mt-1 text-xs leading-5 text-slate-500">
+                  选择地图应用，打开当前位置到目标地点的外部导航。
+                </p>
+              </div>
             </div>
-            <div className="mt-5 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
-              预计步行：{routeMeta.walkTime}
+
+            <div className="mt-5 grid gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-2xl border border-blue-100 bg-white/78 px-4 py-3">
+                  <p className="text-xs font-bold text-slate-400">当前起点</p>
+                  <p className="mt-1 text-sm font-black text-slate-800">北门</p>
+                </div>
+                <div className="rounded-2xl border border-blue-100 bg-white/78 px-4 py-3">
+                  <p className="text-xs font-bold text-slate-400">目标地点</p>
+                  <p className="mt-1 text-sm font-black text-slate-800">{routeMeta.title}</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {routeMeta.route.map((step, index) => (
+                  <div key={`${step}-${index}`}>
+                    <div className="rounded-2xl border border-blue-100 bg-white/78 px-4 py-3 text-sm font-bold text-slate-800">
+                      {step}
+                    </div>
+                    {index < routeMeta.route.length - 1 && (
+                      <div className="px-4 py-1 text-blue-500">↓</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
+                预计步行：{routeMeta.walkTime}
+              </div>
+            </div>
+
+            <div className="mt-5 rounded-[20px] border border-white/80 bg-gradient-to-br from-blue-50/90 to-cyan-50/80 p-4 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-black text-slate-950">外部地图</p>
+                  <p className="mt-1 text-xs text-slate-500">外部地图仅作辅助，校园PNG地图仍为主地图。</p>
+                </div>
+                <MapPin className="size-5 shrink-0 text-blue-500" />
+              </div>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={handleOpenAmap}
+                  disabled={!hasSelectedHotspot}
+                  className="inline-flex min-w-[132px] flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 px-4 py-3 text-sm font-bold text-white shadow-glow transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:scale-95 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-400"
+                >
+                  <ExternalLink className="size-4" />
+                  {hasSelectedHotspot ? "高德地图" : "请先选择校园地点"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleOpenBaiduMap}
+                  disabled={!hasSelectedHotspot}
+                  className="inline-flex min-w-[132px] flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-500 px-4 py-3 text-sm font-bold text-white shadow-glow transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:scale-95 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-400"
+                >
+                  <Navigation className="size-4" />
+                  {hasSelectedHotspot ? "百度地图" : "请先选择校园地点"}
+                </button>
+              </div>
             </div>
           </section>
         )}
