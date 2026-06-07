@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { Bot, Loader2, Mic, RotateCcw, Send, Sparkles, UserRound } from "lucide-react";
+import { motion } from "framer-motion";
 import { AppShell } from "@/components/app-shell";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +17,7 @@ const FAILURE_MESSAGE = "暂时无法连接智能体，请稍后再试。";
 const promptGroups = [
   {
     title: "猜你想问",
-    items: ["图书馆在哪", "东门在哪", "体育馆在哪", "双镜湖在哪"],
+    items: ["文汇楼（图书馆）在哪", "西门在哪", "体育馆在哪", "双镜湖在哪"],
   },
   {
     title: "热门咨询",
@@ -127,7 +128,7 @@ export default function ChatPage() {
                     key={item}
                     type="button"
                     onClick={() => void sendMessage(item)}
-                    className="rounded-2xl border border-blue-100 bg-blue-50/55 px-4 py-3 text-left text-sm font-bold text-slate-700 transition-all duration-300 hover:scale-[1.02] hover:bg-blue-600 hover:text-white"
+                    className="rounded-2xl border border-blue-100 bg-blue-50/55 px-4 py-3 text-left text-sm font-bold text-slate-700 transition-all duration-300 hover:scale-[1.02] hover:border-transparent hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-500 hover:text-white active:scale-95"
                   >
                     {item}
                   </button>
@@ -155,8 +156,11 @@ export default function ChatPage() {
 
           <div className="flex-1 space-y-5 overflow-y-auto bg-gradient-to-b from-blue-50/35 to-white px-5 py-5">
             {messages.map((message) => (
-              <div
+              <motion.div
                 key={message.id}
+                initial={{ opacity: 0, x: message.role === "user" ? 32 : -32 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.28, ease: "easeOut" }}
                 className={cn("flex gap-3", message.role === "user" && "justify-end")}
               >
                 {message.role === "assistant" && (
@@ -179,13 +183,24 @@ export default function ChatPage() {
                     <UserRound className="size-5" />
                   </span>
                 )}
-              </div>
+              </motion.div>
             ))}
             {loading && (
-              <div className="flex items-center gap-3 rounded-2xl bg-white/76 px-4 py-3 text-sm font-semibold text-slate-500 shadow-sm">
-                <Loader2 className="size-4 animate-spin text-blue-600" />
-                智能体正在思考并查询知识库...
-              </div>
+              <motion.div
+                initial={{ opacity: 0, x: -24 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-3 rounded-2xl bg-white/76 px-4 py-3 text-sm font-semibold text-slate-500 shadow-sm"
+              >
+                <span className="grid size-8 place-items-center rounded-full bg-blue-600 text-white">
+                  <Bot className="size-4" />
+                </span>
+                <span>智能体正在思考</span>
+                <span className="flex gap-1">
+                  <span className="typing-dot size-1.5 rounded-full bg-blue-600" />
+                  <span className="typing-dot size-1.5 rounded-full bg-blue-600" />
+                  <span className="typing-dot size-1.5 rounded-full bg-blue-600" />
+                </span>
+              </motion.div>
             )}
           </div>
 
@@ -193,7 +208,7 @@ export default function ChatPage() {
             <div className="flex items-end gap-3 rounded-[24px] border border-blue-100 bg-blue-50/45 p-2">
               <button
                 type="button"
-                className="grid size-11 shrink-0 place-items-center rounded-full bg-white text-slate-500 shadow-sm"
+                className="grid size-11 shrink-0 place-items-center rounded-full bg-white text-slate-500 shadow-sm transition hover:scale-105"
                 aria-label="语音输入"
               >
                 <Mic className="size-5" />
@@ -203,12 +218,12 @@ export default function ChatPage() {
                 onChange={(event) => setInput(event.target.value)}
                 rows={1}
                 placeholder="输入校园服务问题，或点击左侧快捷问题..."
-                className="min-h-11 flex-1 resize-none bg-transparent px-2 py-3 text-sm outline-none placeholder:text-slate-400"
+                className="min-h-11 flex-1 resize-none rounded-2xl bg-transparent px-2 py-3 text-sm outline-none placeholder:text-slate-400 transition focus:bg-white/70 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.14)]"
               />
               <button
                 type="submit"
                 disabled={loading || !input.trim()}
-                className="grid size-11 shrink-0 place-items-center rounded-full bg-blue-600 text-white shadow-glow transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="grid size-11 shrink-0 place-items-center rounded-full bg-blue-600 text-white shadow-glow transition hover:rotate-6 hover:scale-110 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="发送"
                 title="发送"
               >
@@ -221,7 +236,7 @@ export default function ChatPage() {
                   key={item}
                   type="button"
                   onClick={() => void sendMessage(item)}
-                  className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-black text-blue-700 transition hover:bg-blue-600 hover:text-white"
+                  className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-black text-blue-700 transition hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-500 hover:text-white active:scale-95"
                 >
                   <Sparkles className="size-3" />
                   {item}

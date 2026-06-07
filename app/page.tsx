@@ -88,22 +88,32 @@ export default function DashboardPage() {
           <motion.section
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-[36px] border border-white/70 bg-white/72 p-6 shadow-card-light backdrop-blur-2xl sm:p-8 lg:p-12"
+            className="relative overflow-hidden rounded-[36px] border border-white/70 bg-white/72 p-6 shadow-card-light backdrop-blur-2xl transition-all duration-300 hover:shadow-2xl sm:p-8 lg:p-12"
           >
-            <div className="absolute -right-24 -top-28 h-[420px] w-[420px] rounded-full bg-cyan-300/25 blur-3xl" />
-            <div className="absolute left-1/3 top-1/2 h-80 w-80 rounded-full bg-blue-500/10 blur-3xl" />
+            <div className="animate-blob-drift absolute -right-24 -top-28 h-[420px] w-[420px] rounded-full bg-cyan-300/25 blur-3xl" />
+            <div className="animate-blob-drift absolute left-1/3 top-1/2 h-80 w-80 rounded-full bg-blue-500/10 blur-3xl [animation-delay:1.8s]" />
             <div className="relative grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
               <div>
                 <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/78 px-4 py-2 text-sm font-black text-blue-700 shadow-sm backdrop-blur-xl">
                   <Sparkles className="size-4" />
                   智慧校园AI公益服务平台
                 </div>
-                <h1 className="max-w-4xl text-5xl font-black tracking-normal text-slate-950 sm:text-7xl">
+                <motion.h1
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.55, ease: "easeOut" }}
+                  className="max-w-4xl text-5xl font-black tracking-normal text-slate-950 sm:text-7xl"
+                >
                   你好，我是扬工智行
-                </h1>
-                <p className="mt-4 text-3xl font-black text-slate-900">
+                </motion.h1>
+                <motion.p
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.12, duration: 0.45, ease: "easeOut" }}
+                  className="mt-4 text-3xl font-black text-slate-900"
+                >
                   你的AI校园成长伙伴
-                </p>
+                </motion.p>
                 <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
                   面向扬州工业职业技术学院全体学生，提供校园导航、AI问答、成长规划、学习资源、安全教育与心理关怀的一体化公益服务。
                 </p>
@@ -117,10 +127,11 @@ export default function DashboardPage() {
                       <Link
                         key={item.href}
                         href={item.href}
-                        className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white shadow-xl transition-all duration-300 hover:scale-[1.02] hover:bg-blue-700"
+                      className="group inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white shadow-xl transition-all duration-300 hover:scale-[1.02] hover:bg-blue-700 active:scale-95"
                       >
                         <Icon className="size-4" />
                         {item.label}
+                        <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
                       </Link>
                     );
                   })}
@@ -130,7 +141,7 @@ export default function DashboardPage() {
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-                className="relative min-h-[360px] overflow-hidden rounded-[32px] border border-white/80 bg-gradient-to-br from-blue-50 to-cyan-50 shadow-card-light"
+                className="animate-float-soft relative min-h-[360px] overflow-hidden rounded-[32px] border border-white/80 bg-gradient-to-br from-blue-50 to-cyan-50 shadow-card-light"
               >
                 <Image src="/campus-map.png" alt="校园背景" fill priority className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-br from-white/80 via-white/20 to-blue-950/10" />
@@ -166,7 +177,7 @@ export default function DashboardPage() {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.04 }}
-                className="group rounded-[24px] border border-white/70 bg-white/78 p-5 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02]"
+                className="group rounded-[24px] border border-white/70 bg-white/78 p-5 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
               >
                 <div className={`mb-4 h-1.5 w-12 rounded-full bg-gradient-to-r ${item.accent}`} />
                 <p className="text-3xl font-black text-slate-950">{item.value}</p>
@@ -194,9 +205,12 @@ export default function DashboardPage() {
                     initial={{ opacity: 0, y: 18 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="group rounded-[24px] border border-white/70 bg-white/82 p-5 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02]"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="group relative overflow-hidden rounded-[24px] border border-white/70 bg-white/82 p-5 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:shadow-2xl"
                   >
-                    <div className={`mb-5 grid size-14 place-items-center rounded-2xl bg-gradient-to-br ${card.gradient} text-white shadow-lg`}>
+                    <div className="absolute -right-14 -top-14 h-32 w-32 rounded-full bg-cyan-300/0 blur-3xl transition-all duration-300 group-hover:bg-cyan-300/25" />
+                    <div className={`animate-float-soft relative mb-5 grid size-14 place-items-center rounded-2xl bg-gradient-to-br ${card.gradient} text-white shadow-lg`}>
                       <Icon className="size-7" />
                     </div>
                     <div className="mb-3 inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">
@@ -206,10 +220,10 @@ export default function DashboardPage() {
                     <p className="mt-3 min-h-20 text-sm leading-7 text-slate-600">{card.desc}</p>
                     <Link
                       href={card.href}
-                      className="mt-5 inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700"
+                      className="group/link mt-5 inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700 active:scale-95"
                     >
                       进入服务
-                      <ArrowRight className="size-4" />
+                      <ArrowRight className="size-4 transition-transform duration-300 group-hover/link:translate-x-1" />
                     </Link>
                   </motion.article>
                 );
@@ -234,7 +248,7 @@ export default function DashboardPage() {
               title="AI助手入口"
               description="围绕校园导航、学习成长、学生事务、安全教育和心理关怀，直接向扬工智行提问。"
               placeholder="例如：我是大一新生，今天应该先了解哪些校园服务？"
-              suggested={["图书馆在哪", "学生证丢了怎么办", "大一成长规划", "最近压力大怎么办"]}
+              suggested={["文汇楼（图书馆）在哪", "学生证丢了怎么办", "大一成长规划", "最近压力大怎么办"]}
             />
           </section>
         </main>

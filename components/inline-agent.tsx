@@ -70,7 +70,7 @@ export function InlineAgent({
               key={item}
               type="button"
               onClick={() => void ask(item)}
-              className="rounded-full bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 transition hover:bg-blue-100"
+              className="rounded-full bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 transition-all duration-300 hover:scale-[1.02] hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-500 hover:text-white active:scale-95"
             >
               {item}
             </button>
@@ -83,12 +83,12 @@ export function InlineAgent({
           value={input}
           onChange={(event) => setInput(event.target.value)}
           placeholder={placeholder}
-          className="min-h-12 flex-1 rounded-2xl border border-blue-100 bg-white/82 px-4 text-sm font-semibold outline-none transition placeholder:text-slate-400 focus:border-blue-400"
+          className="min-h-12 flex-1 rounded-2xl border border-blue-100 bg-white/82 px-4 text-sm font-semibold outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.14)]"
         />
         <button
           type="submit"
           disabled={loading || !input.trim()}
-          className="grid size-12 place-items-center rounded-full bg-blue-600 text-white shadow-glow transition hover:bg-blue-700 disabled:opacity-50"
+          className="grid size-12 place-items-center rounded-full bg-blue-600 text-white shadow-glow transition hover:rotate-6 hover:scale-110 hover:bg-blue-700 disabled:opacity-50"
           aria-label="发送"
         >
           {loading ? <Loader2 className="size-5 animate-spin" /> : <Send className="size-5" />}

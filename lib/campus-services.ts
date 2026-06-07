@@ -14,7 +14,7 @@ export const campusServices = [
     shortTitle: "导航",
     description: "地点查询、路线导览、地图热点联动。",
     capability: "地图导览",
-    prompt: "图书馆在哪？",
+    prompt: "文汇楼（图书馆）在哪？",
     emoji: "📍",
     icon: MapPin,
     accent: "from-blue-500 to-sky-400",

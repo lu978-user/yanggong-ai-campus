@@ -8,17 +8,17 @@ import { CampusMap } from "@/components/campus-map";
 import { MapChatPanel } from "@/components/map-chat-panel";
 import { mapHotspots, type MapHotspotId } from "@/data/map-hotspots";
 
-const popularPlaces = ["图书馆", "东门", "体育馆", "食堂", "双镜湖"];
+const popularPlaces = ["文汇楼（图书馆）", "文筑楼", "体育馆", "双镜湖", "大学生活动中心"];
 const realSceneCards = [
-  ["图书馆", "学习、自习与资料检索中心", "📚"],
+  ["文汇楼（图书馆）", "学习、自习与资料检索中心", "📚"],
   ["体育馆", "体育课程、运动训练与赛事活动", "⚽"],
-  ["食堂", "校园生活服务与就餐推荐", "🍜"],
-  ["宿舍", "学生生活区与安全关怀场景", "🏠"],
-  ["行政楼", "学生事务、咨询与办理指引", "🏫"],
+  ["文筑楼（实训中心）", "实训实践、技能训练与项目实作", "🏫"],
+  ["竹青院", "西区学生宿舍与生活服务", "🏠"],
+  ["梅香园", "西区学生宿舍与安全关怀场景", "🏠"],
 ];
 
 export default function MapPage() {
-  const [activeMapId, setActiveMapId] = useState<MapHotspotId | null>("library");
+  const [activeMapId, setActiveMapId] = useState<MapHotspotId | null>("wenhui_building");
   const [routeMapId, setRouteMapId] = useState<MapHotspotId | null>(null);
 
   const activeHotspot = useMemo(

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { HeartHandshake, PhoneCall, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
 import { AppShell } from "@/components/app-shell";
 import { InlineAgent } from "@/components/inline-agent";
 
@@ -23,6 +24,12 @@ const knowledge = ["情绪急救包", "睡眠改善指南", "考试周稳定计�
 
 export default function CarePage() {
   const [active, setActive] = useState(topics[0]);
+  const [testing, setTesting] = useState<string | null>(null);
+
+  function startTest(title: string) {
+    setTesting(title);
+    window.setTimeout(() => setTesting(null), 900);
+  }
 
   return (
     <AppShell>
@@ -35,7 +42,7 @@ export default function CarePage() {
             <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600">
               面向学习压力、考试焦虑、情绪管理、人际关系和睡眠困扰，提供温和、非评判的公益支持引导，不替代专业心理咨询。
             </p>
-            <button className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-violet-500 px-5 py-3 text-sm font-black text-white shadow-xl">
+            <button className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-violet-500 px-5 py-3 text-sm font-black text-white shadow-xl transition hover:scale-[1.02] active:scale-95">
               <PhoneCall className="size-4" />
               紧急求助
             </button>
@@ -44,16 +51,26 @@ export default function CarePage() {
 
         <section className="mt-6 grid gap-4 md:grid-cols-4">
           {tests.map(([title, desc]) => (
-            <article
+            <button
               key={title}
-              className="rounded-[24px] border border-white/70 bg-white/82 p-5 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02]"
+              type="button"
+              onClick={() => startTest(title)}
+              className="relative overflow-hidden rounded-[24px] border border-white/70 bg-white/82 p-5 text-left shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02] hover:bg-gradient-to-br hover:from-pink-50 hover:to-violet-50 hover:shadow-2xl"
             >
               <div className="mb-4 grid size-12 place-items-center rounded-2xl bg-pink-50 text-2xl">
                 💗
               </div>
               <h2 className="font-black text-slate-950">{title}</h2>
               <p className="mt-2 text-sm leading-6 text-slate-600">{desc}</p>
-            </article>
+              {testing === title && (
+                <motion.div
+                  className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-pink-500 to-violet-500"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 0.9, ease: "easeOut" }}
+                />
+              )}
+            </button>
           ))}
         </section>
 
@@ -87,7 +104,7 @@ export default function CarePage() {
               </div>
             </div>
             <p className="mt-5 text-base leading-8 text-slate-600">{active[1]}</p>
-            <div className="mt-6 rounded-2xl bg-pink-50 p-5 text-sm leading-7 text-slate-600">
+            <div className="animate-breathe-soft mt-6 rounded-2xl bg-pink-50 p-5 text-sm leading-7 text-slate-600">
               如果出现持续痛苦、明显危机或无法保证安全，请立即联系辅导员、学校心理健康教育中心、家人或当地紧急救助渠道。
             </div>
           </section>

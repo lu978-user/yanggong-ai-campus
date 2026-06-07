@@ -23,11 +23,11 @@ type MapChatPanelProps = {
 };
 
 const recommendedPrompts = [
-  "📍 图书馆在哪",
-  "📍 东门在哪",
+  "📍 文汇楼（图书馆）在哪",
+  "📍 西门在哪",
   "📍 体育馆在哪",
   "📍 双镜湖在哪",
-  "📍 大学生活动中心在哪",
+  "📍 文筑楼在哪",
 ];
 const FAILURE_MESSAGE = "暂时无法连接智能体，请稍后再试。";
 
@@ -132,7 +132,7 @@ export function MapChatPanel({ onMapId }: MapChatPanelProps) {
               key={prompt}
               type="button"
               onClick={() => void sendMessage(prompt)}
-              className="rounded-2xl border border-blue-100 bg-blue-50/70 px-3 py-3 text-left text-xs font-bold text-blue-700 transition hover:-translate-y-0.5 hover:bg-blue-100 hover:shadow-sm"
+              className="rounded-2xl border border-blue-100 bg-blue-50/70 px-3 py-3 text-left text-xs font-bold text-blue-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-transparent hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-500 hover:text-white hover:shadow-sm active:scale-95"
             >
               {prompt}
             </button>
@@ -181,13 +181,13 @@ export function MapChatPanel({ onMapId }: MapChatPanelProps) {
           value={input}
           onChange={(event) => setInput(event.target.value)}
           rows={1}
-          placeholder="输入地点问题，例如：图书馆在哪"
-          className="min-h-11 flex-1 resize-none rounded-2xl border border-blue-100 bg-white/82 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white"
+          placeholder="输入地点问题，例如：文汇楼（图书馆）在哪"
+          className="min-h-11 flex-1 resize-none rounded-2xl border border-blue-100 bg-white/82 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(37,99,235,0.14)]"
         />
         <button
           type="submit"
           disabled={loading || !input.trim()}
-          className="grid size-11 shrink-0 place-items-center rounded-full bg-blue-600 text-white shadow-glow transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="grid size-11 shrink-0 place-items-center rounded-full bg-blue-600 text-white shadow-glow transition hover:rotate-6 hover:scale-110 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           aria-label="发送"
           title="发送"
         >

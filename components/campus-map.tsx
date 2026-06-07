@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { ExternalLink, Navigation, Search } from "lucide-react";
+import { motion } from "framer-motion";
 import { mapHotspots, type MapHotspot, type MapHotspotId } from "@/data/map-hotspots";
 import { getAmapSearchUrl } from "@/lib/amap-link";
 import { cn } from "@/lib/utils";
@@ -72,144 +73,33 @@ const categoryStyles: Record<DisplayCategory, { pin: string; active: string; bad
   },
 };
 
-const hotspotMeta: Record<MapHotspotId, HotspotMeta> = {
-  library: {
-    title: "图书馆（文筑馆）",
-    alias: "图书馆 / 文筑馆",
-    location: "位于校园北部核心学习区，靠近文峰楼、文汇楼与运动场。",
-    function: "自习、借阅、资料检索、学习研讨与校园知识服务。",
-    nearby: "文峰楼、文汇楼、运动场、学生宿舍区",
-    route: ["北门", "春江路", "文筑馆"],
-    walkTime: "3分钟",
-  },
-  east_gate: {
-    title: "东门",
-    alias: "东门 / 东大门",
-    location: "位于校园东侧，连接校外道路与东侧生活区。",
-    function: "校园出入口、访客到达、校外通勤定位。",
-    nearby: "丁香园、学生宿舍区、文筑馆",
-    route: ["东门", "主干道", "文筑馆"],
-    walkTime: "6分钟",
-  },
-  west_gate: {
-    title: "西门",
-    alias: "西门 / 西大门",
-    location: "位于校园西侧，靠近运动场与西侧宿舍区域。",
-    function: "校园出入口、生活服务、校外交通衔接。",
-    nearby: "运动场、体育馆、古津楼",
-    route: ["西门", "运动场", "体育馆"],
-    walkTime: "4分钟",
-  },
-  north_gate: {
-    title: "北门",
-    alias: "北门 / 北大门",
-    location: "位于校园北侧，靠近停车场与主要教学楼区域。",
-    function: "校园北侧出入口、教学区到达、访客定位。",
-    nearby: "停车场、文汇楼、高桥楼",
-    route: ["北门", "停车场", "文汇楼"],
-    walkTime: "5分钟",
-  },
-  sports_hall: {
-    title: "体育馆",
-    alias: "体育馆 / 运动场馆",
-    location: "位于校园南部运动区域，靠近篮球场与运动场。",
-    function: "体育教学、运动训练、社团活动和赛事组织。",
-    nearby: "篮球场、运动场、实训基地",
-    route: ["北门", "明月路", "体育馆"],
-    walkTime: "8分钟",
-  },
-  canteen: {
-    title: "食堂区域",
-    alias: "食堂 / 餐厅",
-    location: "分布在宿舍与活动区域附近，便于学生日常就餐。",
-    function: "学生就餐、生活补给、校园生活服务。",
-    nearby: "大学生活动中心、宿舍区、湖畔园",
-    route: ["北门", "文汇楼", "湖畔园"],
-    walkTime: "7分钟",
-  },
-  shuangjing_lake: {
-    title: "双镜湖",
-    alias: "双镜湖 / 湖区景观",
-    location: "位于校园中东部景观带，靠近大学生活动中心。",
-    function: "休闲散步、校园文化展示、拍照打卡和景观导览。",
-    nearby: "大学生活动中心、湖畔园、高桥楼",
-    route: ["北门", "明月路", "双镜湖"],
-    walkTime: "6分钟",
-  },
-  activity_center: {
-    title: "大学生活动中心",
-    alias: "活动中心 / 学生活动中心",
-    location: "位于双镜湖附近，是校园文化活动的重要场地。",
-    function: "社团活动、学生组织、公益活动、校园展示。",
-    nearby: "双镜湖、湖畔园、文汇楼",
-    route: ["北门", "文汇楼", "大学生活动中心"],
-    walkTime: "7分钟",
-  },
-  dorm_east: {
-    title: "东侧学生宿舍区",
-    alias: "东区宿舍 / 学生宿舍",
-    location: "位于校园东侧生活片区，靠近东门和生活服务设施。",
-    function: "学生住宿、生活服务、夜间安全关怀。",
-    nearby: "东门、食堂区域、活动中心",
-    route: ["东门", "学生宿舍区", "食堂区域"],
-    walkTime: "4分钟",
-  },
-  dorm_west: {
-    title: "西侧学生宿舍区",
-    alias: "西区宿舍 / 学生宿舍",
-    location: "位于校园西侧生活片区，靠近运动场和体育馆。",
-    function: "学生住宿、生活服务、日常返寝路线提示。",
-    nearby: "体育馆、运动场、西门",
-    route: ["西门", "运动场", "西侧宿舍区"],
-    walkTime: "5分钟",
-  },
-  training_base: {
-    title: "实训基地",
-    alias: "实训基地 / 技术实训",
-    location: "位于校园南侧实践教学区域。",
-    function: "技能训练、实践教学、项目实作和工匠精神培养。",
-    nearby: "体育馆、运动场、高桥楼",
-    route: ["北门", "明月路", "实训基地"],
-    walkTime: "9分钟",
-  },
-  wenhui: {
-    title: "文汇楼",
-    alias: "文汇楼 / 教学楼",
-    location: "位于校园中部教学区，靠近双镜湖和大学生活动中心。",
-    function: "日常教学、公共课程、课堂学习。",
-    nearby: "双镜湖、大学生活动中心、高桥楼",
-    route: ["北门", "文汇楼"],
-    walkTime: "5分钟",
-  },
-  wenfeng: {
-    title: "文峰楼",
-    alias: "文峰楼 / 教学楼",
-    location: "位于校园西北教学区，靠近图书馆和华扬楼。",
-    function: "课程教学、教室导航、教学服务。",
-    nearby: "图书馆、华扬楼、运动场",
-    route: ["北门", "春江路", "文峰楼"],
-    walkTime: "6分钟",
-  },
-  zhenzhou: {
-    title: "真州楼",
-    alias: "真州楼 / 教学楼",
-    location: "位于校园中部教学区，周边连通多条主干道。",
-    function: "课程教学、学生事务咨询、教学管理服务。",
-    nearby: "文汇楼、高桥楼、双镜湖",
-    route: ["北门", "明月路", "真州楼"],
-    walkTime: "6分钟",
-  },
-  gaoqiao: {
-    title: "高桥楼",
-    alias: "高桥楼 / 教学楼",
-    location: "位于双镜湖南侧，靠近实训基地与体育馆。",
-    function: "课程教学、教学服务、实践学习衔接。",
-    nearby: "双镜湖、体育馆、实训基地",
-    route: ["北门", "明月路", "高桥楼"],
-    walkTime: "7分钟",
-  },
-};
+function buildHotspotMeta(hotspot: MapHotspot): HotspotMeta {
+  const route = ["北门", "校园主干道", hotspot.name];
+  const categoryText = {
+    gate: "校园出入口与到校定位",
+    study: "学习、自习、借阅与资料检索",
+    life: "校园生活与日常服务",
+    sport: "体育课程、运动训练与活动集合",
+    landscape: "校园景观、休闲与文化导览",
+    activity: "社团活动、学生组织与校园公益活动",
+    teaching: "课程教学、实训实践与楼宇导览",
+    dorm: "学生住宿、生活服务与安全关怀",
+  }[hotspot.category];
 
+  return {
+    title: hotspot.name,
+    alias: hotspot.alias.join(" / "),
+    location: hotspot.description,
+    function: categoryText,
+    nearby: hotspot.alias.slice(0, 3).join("、") || "校园主干道",
+    route,
+    walkTime: hotspot.category === "gate" ? "3分钟" : "5-8分钟",
+  };
+}
+
+const hotspotMeta: Record<MapHotspotId, HotspotMeta> = Object.fromEntries(
+  mapHotspots.map((hotspot) => [hotspot.id, buildHotspotMeta(hotspot)]),
+) as Record<MapHotspotId, HotspotMeta>;
 function getDisplayCategory(hotspot: MapHotspot): DisplayCategory {
   if (hotspot.category === "gate") return "gate";
   if (hotspot.category === "sport") return "sport";
@@ -219,13 +109,14 @@ function getDisplayCategory(hotspot: MapHotspot): DisplayCategory {
 }
 
 function getHotspotIcon(hotspot: MapHotspot) {
-  if (hotspot.id === "library") return "📚";
-  if (hotspot.id === "canteen") return "🍜";
+  if (hotspot.id === "wenhui_building") return "📚";
+  if (hotspot.id === "wenzhu_building") return "🏫";
   if (hotspot.id === "sports_hall") return "⚽";
-  if (hotspot.id === "shuangjing_lake") return "🌊";
+  if (["shuangjing_lake", "dingxiang_garden", "qinchun_garden", "hupan_garden", "erfen_bridge"].includes(hotspot.id)) return "🌊";
   if (hotspot.category === "gate") return "🚪";
   if (hotspot.category === "dorm") return "🏠";
   if (hotspot.category === "activity") return "🎭";
+  if (hotspot.category === "sport") return "⚽";
   return "🏫";
 }
 
@@ -298,7 +189,7 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
 
   return (
     <div className="grid min-h-0 gap-4">
-      <div className="rounded-[24px] border border-white/70 bg-white/72 p-4 shadow-card-light backdrop-blur-2xl">
+      <div className="rounded-[24px] border border-white/70 bg-white/72 p-4 shadow-card-light backdrop-blur-2xl transition-all duration-300 hover:scale-[1.005] hover:shadow-2xl">
         <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <form
             onSubmit={handleSearch}
@@ -312,7 +203,7 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
               id="campus-map-search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="搜索图书馆、体育馆、东门..."
+              placeholder="搜索文汇楼、文筑楼、体育馆、双镜湖..."
               className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400"
             />
             <button
@@ -330,13 +221,20 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
                 type="button"
                 onClick={() => setLayer(item.id)}
                 className={cn(
-                  "rounded-full px-3 py-2 text-xs font-bold transition",
+                  "relative overflow-hidden rounded-full px-3 py-2 text-xs font-bold transition-all duration-300",
                   layer === item.id
-                    ? "bg-blue-600 text-white shadow-sm"
+                    ? "text-white shadow-sm"
                     : "border border-blue-100 bg-white/75 text-slate-600 hover:bg-blue-50 hover:text-blue-700",
                 )}
               >
-                {item.label}
+                {layer === item.id && (
+                  <motion.span
+                    layoutId="map-layer-pill"
+                    className="absolute inset-0 z-0 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500"
+                    transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                  />
+                )}
+                <span className="relative z-10">{item.label}</span>
               </button>
             ))}
           </div>
@@ -364,17 +262,23 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
                   type="button"
                   onClick={() => onSelect(hotspot.id)}
                   className={cn(
-                    "absolute z-10 grid size-10 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-white bg-gradient-to-br text-lg shadow-xl transition-all duration-300 hover:scale-125",
+                    "group absolute z-10 grid size-10 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-white bg-gradient-to-br text-lg shadow-xl transition-all duration-300 hover:scale-125",
                     styles.pin,
                     isActive && "ring-4",
                     isActive && styles.active,
-                    isLocating && "scale-[1.8] animate-pulse",
+                    (isLocating || isActive) && "scale-[1.6] animate-pulse",
                   )}
                   style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%` }}
                   aria-label={hotspotMeta[hotspot.id].title}
                   title={hotspotMeta[hotspot.id].title}
                 >
+                  {isActive && (
+                    <span className="animate-pulse-ring pointer-events-none absolute inset-0 rounded-full border-2 border-blue-400" />
+                  )}
                   <span className="drop-shadow-sm">{getHotspotIcon(hotspot)}</span>
+                  <span className="pointer-events-none absolute bottom-full left-1/2 mb-3 min-w-max -translate-x-1/2 rounded-xl bg-slate-950 px-3 py-1.5 text-xs font-black text-white opacity-0 shadow-xl transition-all duration-200 group-hover:-translate-y-1 group-hover:opacity-100">
+                    {hotspotMeta[hotspot.id].title}
+                  </span>
                 </button>
               );
             })}
@@ -392,7 +296,13 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1fr_340px]">
-        <section className="rounded-[20px] border border-white/70 bg-white/78 p-5 shadow-card-light backdrop-blur-2xl">
+        <motion.section
+          key={activeHotspot.id}
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="rounded-[20px] border border-white/70 bg-white/78 p-5 shadow-card-light backdrop-blur-2xl transition-all duration-300 hover:shadow-2xl"
+        >
           <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-sm font-bold text-blue-600">📍 建筑名称</p>
@@ -426,7 +336,7 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
           <div className="mt-5 flex flex-wrap gap-3">
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-glow transition hover:bg-blue-700"
+              className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-glow transition hover:bg-blue-700 active:scale-95"
             >
               <Navigation className="size-4" />
               导航到这里
@@ -434,13 +344,13 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
             <button
               type="button"
               onClick={handleOpenAmap}
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 px-5 py-3 text-sm font-bold text-white shadow-glow transition hover:-translate-y-0.5 hover:shadow-xl"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 px-5 py-3 text-sm font-bold text-white shadow-glow transition hover:-translate-y-0.5 hover:shadow-xl active:scale-95"
             >
               <ExternalLink className="size-4" />
               打开高德地图
             </button>
           </div>
-        </section>
+        </motion.section>
 
         {routeMeta && (
           <section className="rounded-[20px] border border-white/70 bg-gradient-to-br from-white/86 to-blue-50/76 p-5 shadow-card-light backdrop-blur-2xl">

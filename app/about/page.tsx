@@ -1,5 +1,9 @@
+"use client";
+
 import type { LucideIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Bot, Cloud, Database, Layers3, MapPinned, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
 import { AppShell } from "@/components/app-shell";
 import { InlineAgent } from "@/components/inline-agent";
 
@@ -9,6 +13,13 @@ const innovations = [
   ["AI成长规划", "面向全校专业，结合年级、目标和兴趣方向生成学习路线。"],
   ["AI学习助手", "聚合图书、课程、竞赛、证书资源，支持个性化咨询。"],
   ["公益服务平台", "将安全教育、心理关怀、学生事务与校园服务整合为统一入口。"],
+];
+
+const valueStats = [
+  ["服务模块", 6, "+"],
+  ["知识库文档", 120, "+"],
+  ["热点定位", 15, "+"],
+  ["满意度", 98, "%"],
 ];
 
 export default function AboutPage() {
@@ -41,6 +52,17 @@ export default function AboutPage() {
             <p className="mt-4 text-sm leading-8 text-white/85">
               降低校园服务获取门槛，提升学生校园适应效率，增强安全与心理公益支持能力，为职业院校智慧校园建设提供可落地样板。
             </p>
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              {valueStats.map(([label, value, suffix]) => (
+                <div key={label} className="rounded-2xl bg-white/16 p-3 backdrop-blur-xl">
+                  <p className="text-2xl font-black">
+                    <CountUp value={Number(value)} />
+                    {suffix}
+                  </p>
+                  <p className="mt-1 text-xs font-bold text-white/75">{label}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -62,7 +84,7 @@ export default function AboutPage() {
             <h2 className="mt-1 text-2xl font-black text-slate-950">技术栈展示</h2>
             <div className="mt-4 flex flex-wrap gap-2">
               {techStack.map((item) => (
-                <span key={item} className="rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-700">
+                <span key={item} className="rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-700 transition-all duration-300 hover:-translate-y-1 hover:bg-blue-600 hover:text-white hover:shadow-xl">
                   {item}
                 </span>
               ))}
@@ -70,14 +92,18 @@ export default function AboutPage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            {innovations.map(([title, desc]) => (
-              <article
+            {innovations.map(([title, desc], index) => (
+              <motion.article
                 key={title}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.35 }}
+                transition={{ delay: index * 0.08, duration: 0.35, ease: "easeOut" }}
                 className="rounded-[24px] border border-white/70 bg-white/82 p-5 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02]"
               >
                 <p className="text-xl font-black text-slate-950">{title}</p>
                 <p className="mt-3 text-sm leading-7 text-slate-600">{desc}</p>
-              </article>
+              </motion.article>
             ))}
           </div>
         </section>
@@ -105,12 +131,32 @@ function ArchCard({
   desc: string;
 }) {
   return (
-    <article className="rounded-[24px] border border-blue-100 bg-blue-50/45 p-5 text-center">
+    <article className="group relative rounded-[24px] border border-blue-100 bg-blue-50/45 p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-xl">
       <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-blue-600 text-white">
         <Icon className="size-6" />
       </div>
       <h3 className="mt-4 font-black text-slate-950">{title}</h3>
       <p className="mt-2 text-xs leading-5 text-slate-600">{desc}</p>
+      <div className="pointer-events-none absolute -top-3 left-1/2 z-20 w-44 -translate-x-1/2 -translate-y-full rounded-2xl bg-slate-950 px-3 py-2 text-xs font-bold leading-5 text-white opacity-0 shadow-xl transition-all duration-300 group-hover:-translate-y-[calc(100%+6px)] group-hover:opacity-100">
+        {desc}
+      </div>
     </article>
   );
+}
+
+function CountUp({ value }: { value: number }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let frame = 0;
+    const total = 28;
+    const timer = window.setInterval(() => {
+      frame += 1;
+      setCount(Math.round((value * frame) / total));
+      if (frame >= total) window.clearInterval(timer);
+    }, 24);
+    return () => window.clearInterval(timer);
+  }, [value]);
+
+  return count;
 }

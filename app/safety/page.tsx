@@ -1,4 +1,8 @@
-import { AlertTriangle, Flame, ShieldCheck } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { AlertTriangle, ChevronDown, Flame, ShieldCheck } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { AppShell } from "@/components/app-shell";
 import { InlineAgent } from "@/components/inline-agent";
 
@@ -48,6 +52,8 @@ const safetyCards = [
 ];
 
 export default function SafetyPage() {
+  const [openCard, setOpenCard] = useState(safetyCards[0].title);
+
   return (
     <AppShell>
       <div className="mx-auto max-w-[1500px] px-5 py-6">
@@ -62,25 +68,48 @@ export default function SafetyPage() {
         </section>
 
         <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {safetyCards.map((item) => (
+          {safetyCards.map((item) => {
+            const open = openCard === item.title;
+            return (
             <article
               key={item.title}
-              className="rounded-[26px] border border-white/70 bg-white/82 p-5 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02]"
+              className="group rounded-[26px] border border-white/70 bg-white/82 p-5 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02] hover:border-orange-300 hover:shadow-2xl"
             >
               <div className="mb-4 flex items-start justify-between gap-4">
                 <span className="grid size-14 place-items-center rounded-2xl bg-orange-50 text-3xl">
                   {item.icon}
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-3 py-1 text-xs font-black text-orange-700">
+                <span className="animate-breathe-soft inline-flex items-center gap-1 rounded-full bg-orange-50 px-3 py-1 text-xs font-black text-orange-700">
                   <AlertTriangle className="size-3" />
                   {item.level}
                 </span>
               </div>
               <h2 className="text-2xl font-black text-slate-950">{item.title}</h2>
-              <Info label="案例分析" value={item.case} />
-              <Info label="防范建议" value={item.advice} />
+              <button
+                type="button"
+                onClick={() => setOpenCard(open ? "" : item.title)}
+                className="mt-4 flex w-full items-center justify-between rounded-2xl bg-orange-50/60 px-4 py-3 text-left text-sm font-black text-orange-700 transition hover:bg-gradient-to-r hover:from-orange-500 hover:to-red-500 hover:text-white"
+              >
+                查看防范建议
+                <ChevronDown className={`size-4 transition ${open ? "rotate-180" : ""}`} />
+              </button>
+              <AnimatePresence initial={false}>
+                {open && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.28, ease: "easeOut" }}
+                    className="overflow-hidden"
+                  >
+                    <Info label="案例分析" value={item.case} />
+                    <Info label="防范建议" value={item.advice} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </article>
-          ))}
+          );
+          })}
         </section>
 
         <section className="mt-6 grid gap-5 lg:grid-cols-[1fr_360px]">

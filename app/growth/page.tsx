@@ -3,8 +3,10 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { BrainCircuit, BriefcaseBusiness, Medal, Radar, ScrollText, TrendingUp } from "lucide-react";
+import { motion } from "framer-motion";
 import { AppShell } from "@/components/app-shell";
 import { InlineAgent } from "@/components/inline-agent";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 const colleges = [
   {
@@ -45,6 +47,7 @@ const resultCards = [
 
 export default function GrowthPage() {
   const [diagnosed, setDiagnosed] = useState(false);
+  const [diagnosing, setDiagnosing] = useState(false);
   const [college, setCollege] = useState(colleges[0].name);
   const [major, setMajor] = useState(colleges[0].majors[0]);
   const [grade, setGrade] = useState("大一");
@@ -52,6 +55,15 @@ export default function GrowthPage() {
   const [interest, setInterest] = useState("AI应用开发");
 
   const currentCollege = colleges.find((item) => item.name === college) ?? colleges[0];
+
+  function startDiagnosis() {
+    setDiagnosing(true);
+    setDiagnosed(false);
+    window.setTimeout(() => {
+      setDiagnosing(false);
+      setDiagnosed(true);
+    }, 900);
+  }
 
   return (
     <AppShell>
@@ -138,11 +150,22 @@ export default function GrowthPage() {
             </div>
             <button
               type="button"
-              onClick={() => setDiagnosed(true)}
-              className="mt-6 w-full rounded-full bg-blue-600 px-5 py-3 text-sm font-black text-white shadow-glow transition hover:scale-[1.02] hover:bg-blue-700"
+              onClick={startDiagnosis}
+              disabled={diagnosing}
+              className="mt-6 w-full rounded-full bg-blue-600 px-5 py-3 text-sm font-black text-white shadow-glow transition hover:scale-[1.02] hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-75 active:scale-95"
             >
-              开始诊断
+              {diagnosing ? <LoadingSpinner label="正在诊断..." className="justify-center text-white [&_svg]:text-white" /> : "开始诊断"}
             </button>
+            {diagnosing && (
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-blue-50">
+                <motion.div
+                  className="h-full rounded-full bg-gradient-to-r from-blue-600 to-cyan-500"
+                  initial={{ width: "8%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 0.9, ease: "easeOut" }}
+                />
+              </div>
+            )}
           </section>
 
           <section className="space-y-5">
@@ -152,7 +175,7 @@ export default function GrowthPage() {
                   <h2 className="text-xl font-black text-slate-950">能力雷达图</h2>
                   <Radar className="size-5 text-blue-600" />
                 </div>
-                <div className="mt-5 grid aspect-square place-items-center rounded-[26px] bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+                <div className="animate-scan-line relative mt-5 grid aspect-square place-items-center overflow-hidden rounded-[26px] bg-gradient-to-br from-blue-50 via-white to-cyan-50">
                   <div className="relative grid size-60 place-items-center rounded-full border border-blue-200">
                     <div className="absolute size-48 rounded-full border border-blue-200" />
                     <div className="absolute size-36 rounded-full border border-blue-200" />
@@ -172,12 +195,15 @@ export default function GrowthPage() {
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                {resultCards.map((card) => {
+                {resultCards.map((card, index) => {
                   const Icon = card.icon;
                   return (
-                    <article
+                    <motion.article
                       key={card.title}
-                      className="rounded-[24px] border border-white/70 bg-white/82 p-5 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02]"
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.08, duration: 0.35, ease: "easeOut" }}
+                      className="rounded-[24px] border border-white/70 bg-white/82 p-5 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
                     >
                       <div className="mb-4 grid size-12 place-items-center rounded-2xl bg-blue-50 text-blue-700">
                         <Icon className="size-6" />
@@ -193,7 +219,7 @@ export default function GrowthPage() {
                           </span>
                         ))}
                       </div>
-                    </article>
+                    </motion.article>
                   );
                 })}
               </div>
@@ -211,14 +237,21 @@ export default function GrowthPage() {
               </div>
               <div className="mt-5 grid gap-3 md:grid-cols-4">
                 {timeline.map(([year, title, desc], index) => (
-                  <article key={year} className="relative rounded-2xl bg-gradient-to-br from-blue-50 to-white p-4">
+                  <motion.article
+                    key={year}
+                    initial={{ opacity: 0, y: 14 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    transition={{ delay: index * 0.08, duration: 0.35, ease: "easeOut" }}
+                    className="relative rounded-2xl bg-gradient-to-br from-blue-50 to-white p-4 transition-all duration-300 hover:scale-[1.02]"
+                  >
                     <div className="mb-3 inline-flex rounded-full bg-blue-600 px-3 py-1 text-xs font-black text-white">
                       Step {index + 1}
                     </div>
                     <h3 className="text-xl font-black text-slate-950">{year}</h3>
                     <p className="mt-1 font-black text-blue-700">{title}</p>
                     <p className="mt-2 text-sm leading-6 text-slate-600">{desc}</p>
-                  </article>
+                  </motion.article>
                 ))}
               </div>
             </section>

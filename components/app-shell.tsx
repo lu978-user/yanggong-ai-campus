@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const navGroups = [
@@ -129,7 +130,19 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      <div className="pb-20 lg:pb-0 lg:pl-[240px]">{children}</div>
+      <div className="pb-20 lg:pb-0 lg:pl-[240px]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-blue-100/80 bg-white/92 px-2 py-2 backdrop-blur-xl lg:hidden">
         <div className="grid grid-cols-5 gap-1">
@@ -138,8 +151,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center rounded-2xl px-2 py-1.5 text-[11px] font-black text-slate-500 transition",
-                isActive(item.href) && "bg-blue-600 text-white shadow-glow",
+                "flex flex-col items-center rounded-2xl px-2 py-1.5 text-[11px] font-black text-slate-500 transition-all duration-300 hover:-translate-y-0.5",
+                isActive(item.href) && "bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-glow",
               )}
             >
               <span className="text-base">{item.icon}</span>
@@ -197,7 +210,7 @@ function SidebarContent({
               </button>
               <div
                 className={cn(
-                  "grid overflow-hidden transition-all duration-300",
+                  "grid overflow-hidden transition-all duration-300 ease-out",
                   open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
                 )}
               >
@@ -208,12 +221,14 @@ function SidebarContent({
                       href={item.href}
                       onClick={onNavigate}
                       className={cn(
-                        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-600 transition hover:translate-x-0.5 hover:bg-blue-50 hover:text-blue-700",
+                        "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-600 transition-all duration-300 hover:translate-x-1 hover:bg-blue-50 hover:text-blue-700",
                         isActive(item.href) &&
-                          "bg-blue-600 text-white shadow-glow hover:bg-blue-600 hover:text-white",
+                          "bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-glow hover:text-white",
                       )}
                     >
-                      <span className="w-5 text-center">{item.icon}</span>
+                      <span className="w-5 text-center transition-transform duration-300 group-hover:scale-110">
+                        {item.icon}
+                      </span>
                       {item.label}
                     </Link>
                   ))}
@@ -229,9 +244,11 @@ function SidebarContent({
               key={item.label}
               href={item.href}
               onClick={onNavigate}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-blue-50 hover:text-blue-700"
+              className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-600 transition-all duration-300 hover:translate-x-1 hover:bg-blue-50 hover:text-blue-700"
             >
-              <span className="w-5 text-center">{item.icon}</span>
+              <span className="w-5 text-center transition-transform duration-300 group-hover:scale-110">
+                {item.icon}
+              </span>
               {item.label}
             </Link>
           ))}
