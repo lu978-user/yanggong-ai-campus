@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { InlineAgent } from "@/components/inline-agent";
 
 const routes = ["专业基础", "技能提升", "竞赛实践", "证书规划", "就业方向"];
 const contests = ["蓝桥杯", "中国大学生计算机设计大赛", "挑战杯", "互联网+创新创业"];
@@ -73,6 +74,14 @@ export default function GrowthPage() {
               </div>
             </div>
           </section>
+        </div>
+        <div className="mt-6">
+          <InlineAgent
+            title="成长规划智能体"
+            description="根据专业、年级和目标，生成学习路线、竞赛建议和证书规划。"
+            placeholder="例如：我是计算机应用技术专业大一，想专升本怎么规划？"
+            suggested={["大一计算机怎么规划", "专升本学习路线", "推荐竞赛和证书", "就业方向怎么选"]}
+          />
         </div>
       </div>
     </AppShell>

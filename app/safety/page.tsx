@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/app-shell";
+import { InlineAgent } from "@/components/inline-agent";
 
 const cases = [
   {
@@ -54,6 +55,14 @@ export default function SafetyPage() {
               <Info label="真实案例" value={item.story} />
             </article>
           ))}
+        </div>
+        <div className="mt-6">
+          <InlineAgent
+            title="安全教育智能体"
+            description="识别可疑信息，获取反诈知识、案例分析和防范建议。"
+            placeholder="例如：有人让我先交押金做兼职靠谱吗？"
+            suggested={["刷单诈骗怎么识别", "冒充客服怎么办", "校园贷有哪些风险", "可疑兼职怎么判断"]}
+          />
         </div>
       </div>
     </AppShell>

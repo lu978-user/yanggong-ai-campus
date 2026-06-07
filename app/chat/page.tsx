@@ -42,10 +42,7 @@ export default function ChatPage() {
       const response = await fetch("/api/dify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: query,
-          conversationId,
-        }),
+        body: JSON.stringify({ message: query, conversationId }),
       });
       const data = (await response.json()) as {
         answer: string;
@@ -65,11 +62,7 @@ export default function ChatPage() {
     } catch {
       setMessages((current) => [
         ...current,
-        {
-          id: createId(),
-          role: "assistant",
-          content: FAILURE_MESSAGE,
-        },
+        { id: createId(), role: "assistant", content: FAILURE_MESSAGE },
       ]);
     } finally {
       setLoading(false);
@@ -84,12 +77,15 @@ export default function ChatPage() {
   return (
     <AppShell>
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-5">
-          <p className="text-sm font-bold text-blue-600">AI聊天</p>
-          <h1 className="mt-2 text-3xl font-black text-slate-950">校园公益服务助手</h1>
+        <div className="mb-5 rounded-[28px] border border-white/70 bg-white/76 p-6 shadow-card-light backdrop-blur-2xl">
+          <p className="text-sm font-bold text-blue-600">AI助手</p>
+          <h1 className="mt-2 text-4xl font-black text-slate-950">校园公益服务助手</h1>
+          <p className="mt-3 text-sm leading-7 text-slate-600">
+            支持连续对话，保留 Dify conversationId 上下文记忆。
+          </p>
         </div>
 
-        <section className="flex min-h-[680px] flex-1 flex-col rounded-3xl border border-blue-100 bg-white shadow-card-light">
+        <section className="flex min-h-[680px] flex-1 flex-col rounded-[28px] border border-white/70 bg-white/78 shadow-card-light backdrop-blur-2xl">
           <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
             {messages.map((message) => (
               <div
@@ -132,7 +128,7 @@ export default function ChatPage() {
               onChange={(event) => setInput(event.target.value)}
               rows={1}
               placeholder="输入校园服务问题"
-              className="min-h-11 flex-1 resize-none rounded-2xl border border-blue-100 bg-blue-50/60 px-4 py-3 text-sm outline-none transition focus:border-blue-400 focus:bg-white"
+              className="min-h-11 flex-1 resize-none rounded-2xl border border-blue-100 bg-white/82 px-4 py-3 text-sm outline-none transition focus:border-blue-400 focus:bg-white"
             />
             <button
               type="submit"

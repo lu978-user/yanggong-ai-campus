@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { InlineAgent } from "@/components/inline-agent";
 
 const topics = [
   ["学习压力", "把任务拆成今天能完成的一小步，先恢复节奏，再逐步提高完成度。"],
@@ -45,6 +46,14 @@ export default function CarePage() {
               如出现持续痛苦、明显危机或无法保证安全，请立即联系辅导员、学校心理健康教育中心、家人或当地紧急救助渠道。
             </div>
           </section>
+        </div>
+        <div className="mt-6">
+          <InlineAgent
+            title="心理关怀智能体"
+            description="获取压力调节、情绪管理和校园支持资源引导。"
+            placeholder="例如：我最近学习压力很大，应该怎么调整？"
+            suggested={["学习压力大怎么办", "考试焦虑怎么办", "如何管理情绪", "人际关系困扰怎么办"]}
+          />
         </div>
       </div>
     </AppShell>
