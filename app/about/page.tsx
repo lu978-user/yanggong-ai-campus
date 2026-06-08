@@ -7,18 +7,18 @@ import { motion } from "framer-motion";
 import { AppShell } from "@/components/app-shell";
 import { InlineAgent } from "@/components/inline-agent";
 
-const techStack = ["Next.js", "TypeScript", "TailwindCSS", "Dify", "高德地图", "阿里云ECS"];
+const techStack = ["Next.js", "TypeScript", "TailwindCSS", "Dify", "高德地图", "百度地图", "阿里云ECS"];
 const innovations = [
-  ["AI校园导航", "Dify回答中的mapId驱动校园PNG热点高亮，并提供高德地图外部辅助导航。"],
-  ["AI成长规划", "面向全校专业，结合年级、目标和兴趣方向生成学习路线。"],
-  ["AI学习助手", "聚合图书、课程、竞赛、证书资源，支持个性化咨询。"],
-  ["公益服务平台", "将安全教育、心理关怀、学生事务与校园服务整合为统一入口。"],
+  ["AI智能问答", "基于Dify Chatflow和校园知识库，支持连续对话与多意图校园咨询。"],
+  ["校园地图联动", "Dify回答中的mapId驱动校园PNG热点高亮，并提供高德与百度地图外部辅助导航。"],
+  ["成长规划推荐", "面向全校专业，结合年级、目标和兴趣方向生成学习路线。"],
+  ["校园公益服务", "将安全教育、心理关怀、学生事务与校园服务整合为统一入口。"],
 ];
 
 const valueStats = [
-  ["服务模块", 6, "+"],
+  ["服务模块", 8, "+"],
   ["知识库文档", 120, "+"],
-  ["热点定位", 15, "+"],
+  ["热点定位", 22, "+"],
   ["满意度", 98, "%"],
 ];
 
@@ -26,7 +26,7 @@ export default function AboutPage() {
   return (
     <AppShell>
       <div className="mx-auto max-w-[1500px] px-5 py-6">
-        <section className="overflow-hidden rounded-[34px] border border-white/70 bg-white/72 p-8 shadow-xl backdrop-blur-2xl">
+        <section className="premium-card overflow-hidden p-8">
           <p className="text-sm font-black text-blue-600">Competition Showcase</p>
           <h1 className="mt-2 text-5xl font-black tracking-normal text-slate-950">扬工智行</h1>
           <p className="mt-2 text-xl font-black text-blue-700">YangGong AI Campus</p>
@@ -39,7 +39,7 @@ export default function AboutPage() {
         </section>
 
         <section className="mt-6 grid gap-5 lg:grid-cols-[1fr_420px]">
-          <div className="rounded-[28px] border border-white/70 bg-white/82 p-6 shadow-xl backdrop-blur-2xl">
+          <div className="premium-card p-6">
             <p className="text-sm font-black text-blue-600">项目背景</p>
             <h2 className="mt-1 text-3xl font-black text-slate-950">从单点问答到智慧校园公益平台</h2>
             <p className="mt-4 text-sm leading-8 text-slate-600">
@@ -66,20 +66,35 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="mt-6 rounded-[28px] border border-white/70 bg-white/82 p-6 shadow-xl backdrop-blur-2xl">
+        <section className="premium-card mt-6 p-6">
           <p className="text-sm font-black text-blue-600">Architecture</p>
           <h2 className="mt-1 text-3xl font-black text-slate-950">项目架构图</h2>
+          <div className="mt-6 rounded-[28px] border border-blue-100 bg-gradient-to-br from-slate-950 via-blue-950 to-blue-800 p-5 text-white shadow-2xl">
+            <div className="grid gap-3 md:grid-cols-5">
+              {["Next.js 前端", "API Route", "Dify Chatflow", "校园知识库", "地图与ECS"].map((node, index) => (
+                <div key={node} className="relative rounded-[22px] border border-white/15 bg-white/12 p-4 text-center backdrop-blur-xl">
+                  <p className="text-xs font-bold text-cyan-200">Layer {index + 1}</p>
+                  <p className="mt-2 text-sm font-black">{node}</p>
+                  {index < 4 && (
+                    <span className="absolute -right-3 top-1/2 hidden size-6 -translate-y-1/2 rounded-full bg-cyan-300 text-center text-sm font-black leading-6 text-blue-950 md:block">
+                      →
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
           <div className="mt-6 grid gap-4 md:grid-cols-5">
             <ArchCard icon={Layers3} title="Next.js前端" desc="Dashboard、地图、AI助手与多业务页面" />
             <ArchCard icon={Bot} title="Dify Chatflow" desc="意图分类、知识库问答、连续对话" />
             <ArchCard icon={Database} title="校园数据" desc="热点坐标、服务模块、专业资源" />
-            <ArchCard icon={MapPinned} title="地图能力" desc="PNG主地图、mapId高亮、高德跳转" />
+            <ArchCard icon={MapPinned} title="地图能力" desc="PNG主地图、mapId高亮、高德与百度地图跳转" />
             <ArchCard icon={Cloud} title="部署支撑" desc="GitHub协作、阿里云ECS演示部署" />
           </div>
         </section>
 
         <section className="mt-6 grid gap-5 lg:grid-cols-[360px_1fr]">
-          <div className="rounded-[28px] border border-white/70 bg-white/82 p-6 shadow-xl backdrop-blur-2xl">
+          <div className="premium-card p-6">
             <p className="text-sm font-black text-blue-600">Tech Stack</p>
             <h2 className="mt-1 text-2xl font-black text-slate-950">技术栈展示</h2>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -99,7 +114,7 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.35 }}
                 transition={{ delay: index * 0.08, duration: 0.35, ease: "easeOut" }}
-                className="rounded-[24px] border border-white/70 bg-white/82 p-5 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02]"
+                className="premium-card p-5 transition-all duration-300 hover:scale-[1.02]"
               >
                 <p className="text-xl font-black text-slate-950">{title}</p>
                 <p className="mt-3 text-sm leading-7 text-slate-600">{desc}</p>
@@ -116,6 +131,12 @@ export default function AboutPage() {
             suggested={["项目核心亮点", "技术栈介绍", "Dify如何接入", "比赛答辩怎么讲"]}
           />
         </div>
+        <section className="mt-6 rounded-[32px] bg-gradient-to-r from-slate-950 via-blue-950 to-blue-700 p-8 text-center text-white shadow-2xl">
+          <p className="text-sm font-black text-cyan-200">Project Slogan</p>
+          <h2 className="mt-3 text-3xl font-black tracking-normal">
+            让校园信息从“能查询”升级为“能理解、能定位、能指导”。
+          </h2>
+        </section>
       </div>
     </AppShell>
   );

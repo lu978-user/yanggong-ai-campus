@@ -1,6 +1,7 @@
 import {
   ClipboardList,
   MapPin,
+  Megaphone,
   School,
   ShieldCheck,
   Soup,
@@ -31,6 +32,18 @@ export const campusServices = [
     icon: Soup,
     accent: "from-cyan-500 to-blue-400",
     tint: "bg-cyan-50 text-cyan-700",
+  },
+  {
+    id: "campus_opportunities",
+    title: "校园机会",
+    shortTitle: "机会",
+    description: "招聘、社团、志愿、比赛、讲座和勤工助学通知解读。",
+    capability: "机会中心",
+    prompt: "最近适合大一学生参加的校园机会有哪些？",
+    emoji: "📢",
+    icon: Megaphone,
+    accent: "from-teal-500 to-emerald-400",
+    tint: "bg-teal-50 text-teal-700",
   },
   {
     id: "growth_plan",

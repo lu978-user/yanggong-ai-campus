@@ -194,7 +194,7 @@ export default function ChatPage() {
                 <span className="grid size-8 place-items-center rounded-full bg-blue-600 text-white">
                   <Bot className="size-4" />
                 </span>
-                <span>智能体正在思考</span>
+                <span>扬工智行正在检索校园知识库...</span>
                 <span className="flex gap-1">
                   <span className="typing-dot size-1.5 rounded-full bg-blue-600" />
                   <span className="typing-dot size-1.5 rounded-full bg-blue-600" />
@@ -205,7 +205,7 @@ export default function ChatPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="border-t border-blue-100 bg-white/86 p-4">
-            <div className="flex items-end gap-3 rounded-[24px] border border-blue-100 bg-blue-50/45 p-2">
+            <div className="flex items-end gap-3 rounded-[30px] border border-blue-100 bg-blue-50/45 p-2 shadow-inner">
               <button
                 type="button"
                 className="grid size-11 shrink-0 place-items-center rounded-full bg-white text-slate-500 shadow-sm transition hover:scale-105"
@@ -218,7 +218,7 @@ export default function ChatPage() {
                 onChange={(event) => setInput(event.target.value)}
                 rows={1}
                 placeholder="输入校园服务问题，或点击左侧快捷问题..."
-                className="min-h-11 flex-1 resize-none rounded-2xl bg-transparent px-2 py-3 text-sm outline-none placeholder:text-slate-400 transition focus:bg-white/70 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.14)]"
+                className="min-h-12 flex-1 resize-none rounded-[24px] bg-transparent px-3 py-3 text-sm outline-none placeholder:text-slate-400 transition focus:bg-white/80 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.14)]"
               />
               <button
                 type="submit"

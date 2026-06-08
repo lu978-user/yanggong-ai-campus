@@ -2,6 +2,7 @@
 
 import { FormEvent, useRef, useState } from "react";
 import { Bot, Loader2, Send, Sparkles, UserRound } from "lucide-react";
+import { motion } from "framer-motion";
 import { type MapHotspotId } from "@/data/map-hotspots";
 import { cn } from "@/lib/utils";
 
@@ -108,7 +109,7 @@ export function MapChatPanel({ onMapId }: MapChatPanelProps) {
   }
 
   return (
-    <aside className="flex min-h-[760px] flex-col rounded-[24px] border border-white/70 bg-white/78 shadow-card-light backdrop-blur-2xl">
+    <aside className="flex min-h-[760px] flex-col rounded-[24px] border border-white/70 bg-white/76 shadow-card-light backdrop-blur-2xl">
       <div className="border-b border-blue-100/80 px-5 py-4">
         <div className="flex items-center gap-3">
           <span className="grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 text-white shadow-glow">
@@ -126,13 +127,13 @@ export function MapChatPanel({ onMapId }: MapChatPanelProps) {
           <Sparkles className="size-4 text-blue-500" />
           推荐提问
         </div>
-        <div className="grid gap-2">
+        <div className="flex flex-wrap gap-2">
           {recommendedPrompts.map((prompt) => (
             <button
               key={prompt}
               type="button"
               onClick={() => void sendMessage(prompt)}
-              className="rounded-2xl border border-blue-100 bg-blue-50/70 px-3 py-3 text-left text-xs font-bold text-blue-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-transparent hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-500 hover:text-white hover:shadow-sm active:scale-95"
+              className="rounded-full border border-blue-100 bg-blue-50/70 px-3 py-2 text-left text-xs font-bold text-blue-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-transparent hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-500 hover:text-white hover:shadow-sm active:scale-95"
             >
               {prompt}
             </button>
@@ -142,8 +143,11 @@ export function MapChatPanel({ onMapId }: MapChatPanelProps) {
 
       <div ref={listRef} className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
         {messages.map((message) => (
-          <div
+          <motion.div
             key={message.id}
+            initial={{ opacity: 0, x: message.role === "user" ? 24 : -24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.28, ease: "easeOut" }}
             className={cn("flex gap-3", message.role === "user" && "justify-end")}
           >
             {message.role === "assistant" && (
@@ -166,12 +170,12 @@ export function MapChatPanel({ onMapId }: MapChatPanelProps) {
                 <UserRound className="size-4" />
               </span>
             )}
-          </div>
+          </motion.div>
         ))}
         {loading && (
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-500">
+          <div className="flex items-center gap-2 rounded-2xl bg-blue-50/70 px-4 py-3 text-sm font-semibold text-slate-500">
             <Loader2 className="size-4 animate-spin" />
-            正在请求Dify
+            扬工智行正在检索校园知识库...
           </div>
         )}
       </div>
@@ -182,7 +186,7 @@ export function MapChatPanel({ onMapId }: MapChatPanelProps) {
           onChange={(event) => setInput(event.target.value)}
           rows={1}
           placeholder="输入地点问题，例如：文汇楼（图书馆）在哪"
-          className="min-h-11 flex-1 resize-none rounded-2xl border border-blue-100 bg-white/82 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(37,99,235,0.14)]"
+          className="min-h-14 flex-1 resize-none rounded-[28px] border border-blue-100 bg-white/88 px-5 py-4 text-sm outline-none shadow-inner transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(37,99,235,0.14)]"
         />
         <button
           type="submit"

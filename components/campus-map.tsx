@@ -2,11 +2,13 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { ExternalLink, MapPin, Navigation, Route, Search } from "lucide-react";
+import { Bike, Clock, ExternalLink, Image as ImageIcon, MapPin, Navigation, Route, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { mapHotspots, type MapHotspot, type MapHotspotId } from "@/data/map-hotspots";
 import { getAmapSearchUrl, getBaiduMapSearchUrl } from "@/lib/map-links";
 import { cn } from "@/lib/utils";
+
+const DEBUG_MAP = false;
 
 type CampusMapProps = {
   activeMapId: MapHotspotId | null;
@@ -26,6 +28,8 @@ type HotspotMeta = {
   nearby: string;
   route: string[];
   walkTime: string;
+  bikeTime: string;
+  openTime: string;
 };
 
 const layers: Array<{ id: LayerId; label: string }> = [
@@ -94,6 +98,8 @@ function buildHotspotMeta(hotspot: MapHotspot): HotspotMeta {
     nearby: hotspot.alias.slice(0, 3).join("、") || "校园主干道",
     route,
     walkTime: hotspot.category === "gate" ? "3分钟" : "5-8分钟",
+    bikeTime: hotspot.category === "gate" ? "2分钟" : "3-6分钟",
+    openTime: hotspot.category === "gate" || hotspot.category === "landscape" ? "全天开放" : "以校内通知为准",
   };
 }
 
@@ -108,17 +114,13 @@ function getDisplayCategory(hotspot: MapHotspot): DisplayCategory {
   return "teaching";
 }
 
-function getHotspotIcon(hotspot: MapHotspot) {
-  if (hotspot.id === "wenhui_building") return "📚";
-  if (hotspot.id === "wenzhu_building") return "🏫";
-  if (hotspot.id === "sports_hall") return "⚽";
-  if (["shuangjing_lake", "dingxiang_garden", "qinchun_garden", "hupan_garden", "erfen_bridge"].includes(hotspot.id)) return "🌊";
-  if (hotspot.category === "gate") return "🚪";
-  if (hotspot.category === "dorm") return "🏠";
-  if (hotspot.category === "activity") return "🎭";
-  if (hotspot.category === "sport") return "⚽";
-  return "🏫";
-}
+const visualHotspotIds: MapHotspotId[] = [
+  "wenhui_building",
+  "wenzhu_building",
+  "sports_hall",
+  "shuangjing_lake",
+  "activity_center",
+];
 
 function findHotspot(query: string) {
   const normalized = query.trim().toLowerCase();
@@ -202,8 +204,10 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
   }
 
   return (
-    <div className="grid min-h-0 gap-4">
-      <div className="rounded-[24px] border border-white/70 bg-white/72 p-4 shadow-card-light backdrop-blur-2xl transition-all duration-300 hover:scale-[1.005] hover:shadow-2xl">
+    <div className="grid min-h-0 gap-5">
+      <div className="relative overflow-hidden rounded-[32px] border border-white/80 bg-white/60 p-4 shadow-[0_30px_110px_rgba(37,99,235,0.18)] backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_42px_130px_rgba(37,99,235,0.26)] sm:p-5">
+        <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-28 right-12 h-96 w-96 rounded-full bg-cyan-300/20 blur-3xl" />
         <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <form
             onSubmit={handleSearch}
@@ -254,8 +258,9 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-[24px] border border-blue-100 bg-gradient-to-br from-sky-50 via-white to-emerald-50 shadow-inner">
-          <div className="relative aspect-[16/9] w-full">
+        <div className="relative mx-auto overflow-hidden rounded-[32px] border border-white/90 bg-gradient-to-br from-sky-50 via-white to-cyan-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_0_70px_rgba(56,189,248,0.2)] xl:w-[80%]">
+          <div className="pointer-events-none absolute inset-0 rounded-[32px] ring-1 ring-inset ring-white/95" />
+          <div className="relative h-[520px] w-full sm:h-[620px] xl:h-[720px]">
             <Image
               src="/campus-map.png"
               alt="校园地图"
@@ -267,32 +272,39 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
             {visibleHotspots.map((hotspot) => {
               const isActive = hotspot.id === activeMapId;
               const isLocating = hotspot.id === locatingId;
-              const displayCategory = getDisplayCategory(hotspot);
-              const styles = categoryStyles[displayCategory];
-
               return (
                 <button
                   key={hotspot.id}
                   type="button"
                   onClick={() => onSelect(hotspot.id)}
                   className={cn(
-                    "group absolute z-10 grid size-10 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-white bg-gradient-to-br text-lg shadow-xl transition-all duration-300 hover:scale-125",
-                    styles.pin,
-                    isActive && "ring-4",
-                    isActive && styles.active,
-                    (isLocating || isActive) && "scale-[1.6] animate-pulse",
+                    "group absolute z-10 grid size-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-blue-200/90 bg-white/78 text-xl shadow-lg backdrop-blur-xl transition-all duration-300 hover:z-30 hover:scale-[1.15] hover:border-blue-300 hover:bg-white/92 hover:shadow-xl",
+                    activeMapId && !isActive && "opacity-80",
+                    isActive &&
+                      "z-40 scale-[1.45] border-blue-400 bg-white opacity-100 ring-4 ring-blue-300/70 shadow-[0_0_42px_rgba(37,99,235,0.72)]",
+                    (isLocating || isActive) && "animate-pulse",
                   )}
                   style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%` }}
                   aria-label={hotspotMeta[hotspot.id].title}
                   title={hotspotMeta[hotspot.id].title}
                 >
                   {isActive && (
-                    <span className="animate-pulse-ring pointer-events-none absolute inset-0 rounded-full border-2 border-blue-400" />
+                    <>
+                      <span className="animate-pulse-ring pointer-events-none absolute inset-0 rounded-full border-2 border-blue-400" />
+                      <span className="pointer-events-none absolute inset-[-12px] rounded-full bg-blue-400/30 blur-lg" />
+                    </>
                   )}
-                  <span className="drop-shadow-sm">{getHotspotIcon(hotspot)}</span>
+                  <span className="relative leading-none drop-shadow-sm">{hotspot.icon}</span>
                   <span className="pointer-events-none absolute bottom-full left-1/2 mb-3 min-w-max -translate-x-1/2 rounded-xl bg-slate-950 px-3 py-1.5 text-xs font-black text-white opacity-0 shadow-xl transition-all duration-200 group-hover:-translate-y-1 group-hover:opacity-100">
                     {hotspotMeta[hotspot.id].title}
                   </span>
+                  {DEBUG_MAP && (
+                    <span className="pointer-events-none absolute left-1/2 top-full mt-2 min-w-max -translate-x-1/2 rounded-lg bg-white/90 px-2 py-1 text-[10px] font-black leading-4 text-blue-700 shadow-sm">
+                      {hotspot.id}
+                      <br />
+                      {hotspot.x},{hotspot.y}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -305,46 +317,75 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
                 </p>
               </div>
             )}
+            <div className="absolute right-5 top-5 z-20 rounded-2xl border border-white/80 bg-white/86 px-4 py-3 shadow-card-light backdrop-blur-xl">
+              <p className="text-xs font-black text-blue-600">📍 当前定位</p>
+              <p className="mt-1 max-w-[240px] truncate text-sm font-black text-slate-950">
+                {activeMeta.title}
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1fr_340px]">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
         <motion.section
           key={activeHotspot.id}
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="rounded-[20px] border border-white/70 bg-white/78 p-5 shadow-card-light backdrop-blur-2xl transition-all duration-300 hover:shadow-2xl"
+          className="overflow-hidden rounded-[24px] border border-white/70 bg-white/78 shadow-card-light backdrop-blur-2xl transition-all duration-300 hover:shadow-2xl"
         >
-          <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+          <div className="mb-5 flex flex-wrap items-start justify-between gap-3 bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-5 text-white">
             <div>
-              <p className="text-sm font-bold text-blue-600">📍 建筑名称</p>
-              <h2 className="mt-2 text-2xl font-black text-slate-950">{activeMeta.title}</h2>
-              <p className="mt-1 text-sm font-semibold text-slate-500">{activeMeta.alias}</p>
+              <p className="text-sm font-bold text-white/80">📍 建筑名称</p>
+              <h2 className="mt-2 text-2xl font-black text-white">{activeMeta.title}</h2>
+              <p className="mt-1 text-sm font-semibold text-white/75">{activeMeta.alias}</p>
             </div>
             <span
               className={cn(
-                "rounded-full px-3 py-1.5 text-xs font-bold",
-                categoryStyles[activeCategory].badge,
+                "rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-xl",
               )}
             >
               {categoryLabels[activeCategory]}
             </span>
           </div>
 
+          <div className="p-5 pt-0">
+          {visualHotspotIds.includes(activeHotspot.id) && (
+            <div className="mb-5 grid gap-4 lg:grid-cols-[280px_1fr]">
+              <div className="relative min-h-[180px] overflow-hidden rounded-[24px] border border-white/80 bg-blue-50 shadow-inner">
+                <Image src="/campus-map.png" alt={`${activeMeta.title}地图预览`} fill className="object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-blue-950/10" />
+                <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-white/82 p-3 shadow-sm backdrop-blur-xl">
+                  <p className="flex items-center gap-2 text-xs font-black text-blue-700">
+                    <ImageIcon className="size-4" />
+                    重点建筑预览
+                  </p>
+                  <p className="mt-1 text-sm font-black text-slate-950">{activeMeta.title}</p>
+                </div>
+              </div>
+              <div className="rounded-[24px] border border-blue-100 bg-gradient-to-br from-blue-50/80 to-white p-5">
+                <p className="text-xs font-black text-blue-600">建筑简介</p>
+                <p className="mt-3 text-sm leading-7 text-slate-600">{activeMeta.location}</p>
+              </div>
+            </div>
+          )}
+
           <div className="grid gap-3 sm:grid-cols-2">
             {[
-              ["位置说明", activeMeta.location],
-              ["主要功能", activeMeta.function],
+              ["建筑类型", categoryLabels[activeCategory]],
+              ["简介", activeMeta.location],
+              ["开放时间", activeMeta.openTime],
               ["附近建筑", activeMeta.nearby],
-              ["状态", "已定位"],
+              ["路线规划", `${routeMeta.walkTime} / 骑行${routeMeta.bikeTime}`],
+              ["状态", hasSelectedHotspot ? "已定位" : "请先选择校园地点"],
             ].map(([label, value]) => (
               <div key={label} className="rounded-2xl border border-blue-100 bg-blue-50/45 p-4">
                 <p className="text-xs font-bold text-blue-600">{label}</p>
                 <p className="mt-2 text-sm leading-6 text-slate-700">{value}</p>
               </div>
             ))}
+          </div>
           </div>
 
         </motion.section>
@@ -388,8 +429,15 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
                 ))}
               </div>
 
-              <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
-                预计步行：{routeMeta.walkTime}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="inline-flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
+                  <Clock className="size-4" />
+                  预计步行：{routeMeta.walkTime}
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-2xl bg-blue-50 px-4 py-3 text-sm font-bold text-blue-700">
+                  <Bike className="size-4" />
+                  预计骑行：{routeMeta.bikeTime}
+                </div>
               </div>
             </div>
 
@@ -401,12 +449,12 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
                 </div>
                 <MapPin className="size-5 shrink-0 text-blue-500" />
               </div>
-              <div className="mt-4 flex flex-wrap gap-3">
+              <div className="mt-4 grid overflow-hidden rounded-full border border-white/80 bg-white/76 p-1 shadow-inner sm:grid-cols-2">
                 <button
                   type="button"
                   onClick={handleOpenAmap}
                   disabled={!hasSelectedHotspot}
-                  className="inline-flex min-w-[132px] flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 px-4 py-3 text-sm font-bold text-white shadow-glow transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:scale-95 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-400"
+                  className="inline-flex min-w-[132px] cursor-pointer items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 px-4 py-3 text-sm font-bold text-white shadow-glow transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:scale-95 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-400"
                 >
                   <ExternalLink className="size-4" />
                   {hasSelectedHotspot ? "高德地图" : "请先选择校园地点"}
@@ -415,7 +463,7 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
                   type="button"
                   onClick={handleOpenBaiduMap}
                   disabled={!hasSelectedHotspot}
-                  className="inline-flex min-w-[132px] flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-500 px-4 py-3 text-sm font-bold text-white shadow-glow transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:scale-95 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-400"
+                  className="inline-flex min-w-[132px] cursor-pointer items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-500 px-4 py-3 text-sm font-bold text-white shadow-glow transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:scale-95 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-400"
                 >
                   <Navigation className="size-4" />
                   {hasSelectedHotspot ? "百度地图" : "请先选择校园地点"}

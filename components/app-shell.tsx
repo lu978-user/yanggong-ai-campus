@@ -29,6 +29,7 @@ const navGroups = [
     title: "校园服务",
     items: [
       { href: "/life", label: "校园生活", icon: "🍜" },
+      { href: "/opportunities", label: "校园机会", icon: "📢" },
       { href: "/affairs", label: "学生事务", icon: "📋" },
     ],
   },
@@ -43,7 +44,8 @@ const navGroups = [
 ];
 
 const utilityItems = [
-  { href: "/chat", label: "我的收藏", icon: "⭐" },
+  { href: "/opportunities#my-opportunities", label: "我的机会", icon: "⭐" },
+  { href: "/chat", label: "我的收藏", icon: "📌" },
   { href: "/chat", label: "历史对话", icon: "🕒" },
 ];
 
@@ -51,7 +53,7 @@ const mobileItems = [
   { href: "/", label: "首页", icon: "🏠" },
   { href: "/map", label: "导航", icon: "📍" },
   { href: "/chat", label: "AI", icon: "🤖" },
-  { href: "/growth", label: "成长", icon: "🎓" },
+  { href: "/opportunities", label: "机会", icon: "📢" },
   { href: "/care", label: "关怀", icon: "💗" },
 ];
 

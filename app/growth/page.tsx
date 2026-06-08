@@ -68,16 +68,16 @@ export default function GrowthPage() {
   return (
     <AppShell>
       <div className="mx-auto max-w-[1500px] px-5 py-6">
-        <section className="overflow-hidden rounded-[32px] border border-white/70 bg-white/78 p-6 shadow-xl backdrop-blur-2xl lg:p-8">
+        <section className="premium-card overflow-hidden p-6 lg:p-8">
           <p className="text-sm font-black text-blue-600">Growth Intelligence</p>
-          <h1 className="mt-2 text-4xl font-black text-slate-950 sm:text-5xl">AI成长规划中心</h1>
+          <h1 className="mt-2 text-4xl font-black text-slate-950 sm:text-5xl">AI成长报告</h1>
           <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-600">
             支持全校专业分类、年级目标和兴趣方向输入，结合Dify智能体生成成长评分、学习路线、竞赛证书、就业方向与专转本建议。
           </p>
         </section>
 
-        <div className="mt-6 grid gap-5 xl:grid-cols-[390px_1fr]">
-          <section className="rounded-[28px] border border-white/70 bg-white/82 p-5 shadow-xl backdrop-blur-2xl">
+        <div className="mt-5 grid gap-5 xl:grid-cols-[390px_1fr]">
+          <section className="premium-card p-5">
             <div className="mb-5 flex items-center gap-3">
               <span className="grid size-12 place-items-center rounded-2xl bg-blue-600 text-white">
                 <BrainCircuit className="size-6" />
@@ -170,9 +170,12 @@ export default function GrowthPage() {
 
           <section className="space-y-5">
             <div className="grid gap-5 lg:grid-cols-[340px_1fr]">
-              <div className="rounded-[28px] border border-white/70 bg-white/82 p-5 shadow-xl backdrop-blur-2xl">
+              <div className="premium-card p-5">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-black text-slate-950">能力雷达图</h2>
+                  <div>
+                    <p className="text-sm font-black text-blue-600">成长评分</p>
+                    <h2 className="text-xl font-black text-slate-950">能力雷达图</h2>
+                  </div>
                   <Radar className="size-5 text-blue-600" />
                 </div>
                 <div className="animate-scan-line relative mt-5 grid aspect-square place-items-center overflow-hidden rounded-[26px] bg-gradient-to-br from-blue-50 via-white to-cyan-50">
@@ -203,7 +206,7 @@ export default function GrowthPage() {
                       initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.08, duration: 0.35, ease: "easeOut" }}
-                      className="rounded-[24px] border border-white/70 bg-white/82 p-5 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
+                      className="premium-card p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
                     >
                       <div className="mb-4 grid size-12 place-items-center rounded-2xl bg-blue-50 text-blue-700">
                         <Icon className="size-6" />
@@ -225,7 +228,7 @@ export default function GrowthPage() {
               </div>
             </div>
 
-            <section className="rounded-[28px] border border-white/70 bg-white/82 p-5 shadow-xl backdrop-blur-2xl">
+            <section className="premium-card p-5">
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <p className="text-sm font-black text-blue-600">Growth Timeline</p>
@@ -243,7 +246,7 @@ export default function GrowthPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.4 }}
                     transition={{ delay: index * 0.08, duration: 0.35, ease: "easeOut" }}
-                    className="relative rounded-2xl bg-gradient-to-br from-blue-50 to-white p-4 transition-all duration-300 hover:scale-[1.02]"
+                    className="relative rounded-[24px] border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                   >
                     <div className="mb-3 inline-flex rounded-full bg-blue-600 px-3 py-1 text-xs font-black text-white">
                       Step {index + 1}

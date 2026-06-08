@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import { Clock, Flame, MapPin, RadioTower, UsersRound } from "lucide-react";
+import { Clock, Flame, MapPin, RadioTower, Sparkles, UsersRound } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { CampusMap } from "@/components/campus-map";
 import { MapChatPanel } from "@/components/map-chat-panel";
@@ -33,16 +33,20 @@ export default function MapPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[1800px] px-4 py-6 sm:px-6 lg:px-8">
-        <section className="mb-6 overflow-hidden rounded-[32px] border border-white/70 bg-white/76 p-6 shadow-xl backdrop-blur-2xl">
+      <div className="mx-auto max-w-[1920px] px-4 py-6 sm:px-6 lg:px-8">
+        <section className="relative mb-6 overflow-hidden rounded-[36px] border border-white/70 bg-white/76 p-6 shadow-xl backdrop-blur-2xl">
+          <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-cyan-300/25 blur-3xl" />
           <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
             <div>
-              <p className="text-sm font-bold text-blue-600">AI Campus Navigation</p>
-              <h1 className="mt-2 text-4xl font-black tracking-normal text-slate-950 sm:text-5xl">
+              <p className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/80 px-4 py-2 text-sm font-black text-blue-600">
+                <Sparkles className="size-4" />
+                Apple Maps Inspired Campus Guide
+              </p>
+              <h1 className="mt-4 text-4xl font-black tracking-normal text-slate-950 sm:text-6xl">
                 AI智慧校园导览
               </h1>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-                保留校园PNG主地图，结合Dify智能体、mapId热点定位与高德地图外部导航，完成校园地点查询、路线规划和公益信息导览。
+                保留校园PNG主地图，结合Dify智能体、mapId热点定位、高德与百度地图外部导航，完成校园地点查询、路线规划和公益信息导览。
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 xl:w-[520px]">
@@ -59,7 +63,7 @@ export default function MapPage() {
           <MetricCard icon={UsersRound} label="服务对象" value="全体在校学生" />
         </section>
 
-        <div className="grid gap-5 xl:grid-cols-[70fr_30fr]">
+        <div className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_420px]">
           <div className="space-y-5">
             <CampusMap
               activeMapId={activeMapId}
