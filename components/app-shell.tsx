@@ -45,6 +45,7 @@ const navGroups = [
 
 const utilityItems = [
   { href: "/opportunities#my-opportunities", label: "我的机会", icon: "⭐" },
+  { href: "/opportunity-admin", label: "机会管理", icon: "🛠" },
   { href: "/chat", label: "我的收藏", icon: "📌" },
   { href: "/chat", label: "历史对话", icon: "🕒" },
 ];
@@ -91,7 +92,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <main className="min-h-screen bg-page text-foreground transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+    <main className="min-h-screen overflow-x-hidden bg-page text-foreground transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[240px] overflow-y-auto border-r border-white/70 bg-white/72 px-4 py-5 shadow-card-light backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-950/90 lg:block">
         <SidebarContent
           isActive={isActive}

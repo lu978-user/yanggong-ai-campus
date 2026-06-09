@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Bookmark,
@@ -13,6 +14,12 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { CountUp } from "@/components/count-up";
+import {
+  defaultOpportunities,
+  getOpportunities,
+  opportunityCategories,
+  type Opportunity,
+} from "@/data/opportunities";
 import { sanitizeResponse } from "@/lib/response-sanitizer";
 
 type OpportunityNotice = {
@@ -39,16 +46,7 @@ type FavoriteOpportunity = {
 
 const categoryFilters = [
   "全部",
-  "班主任助理",
-  "学生组织",
-  "社团活动",
-  "志愿服务",
-  "校园活动",
-  "技能竞赛",
-  "创新创业",
-  "实习实践",
-  "讲座培训",
-  "奖学金评优",
+  ...opportunityCategories,
 ];
 
 const stats = [
@@ -56,73 +54,6 @@ const stats = [
   ["正在报名", 8],
   ["即将截止", 3],
   ["推荐机会", 5],
-];
-
-const hotOpportunities = [
-  {
-    title: "班主任助理",
-    type: "班主任助理",
-    deadline: "6月25日",
-    score: 5,
-    audience: ["大二", "大三", "学生干部", "责任心强"],
-    summary: "适合希望积累学生工作经历、提升组织协调能力的同学。",
-  },
-  {
-    title: "学生组织",
-    type: "学生组织",
-    deadline: "6月22日",
-    score: 4,
-    audience: ["大一", "大二", "沟通表达", "活动策划"],
-    summary: "参与学生组织工作，积累校园服务、活动执行和团队协作经验。",
-  },
-  {
-    title: "社团招新",
-    type: "社团活动",
-    deadline: "6月20日",
-    score: 4,
-    audience: ["大一", "兴趣拓展", "校园融入"],
-    summary: "找到兴趣组织，建立校园连接，适合新生快速融入校园。",
-  },
-  {
-    title: "志愿服务",
-    type: "志愿服务",
-    deadline: "6月18日",
-    score: 5,
-    audience: ["公益服务", "志愿时长", "社会实践"],
-    summary: "适合希望积累公益服务经历、提升社会责任感的同学。",
-  },
-  {
-    title: "校园活动",
-    type: "校园活动",
-    deadline: "6月28日",
-    score: 4,
-    audience: ["活动执行", "校园融入", "综合素质"],
-    summary: "适合希望拓展校园参与、提升表达与组织能力的同学。",
-  },
-  {
-    title: "技能竞赛",
-    type: "技能竞赛",
-    deadline: "7月5日",
-    score: 5,
-    audience: ["计算机应用技术", "软件技术", "人工智能技术应用"],
-    summary: "适合信息工程类专业学生提升算法、编程与竞赛能力。",
-  },
-  {
-    title: "创新创业项目",
-    type: "创新创业",
-    deadline: "7月12日",
-    score: 4,
-    audience: ["项目实践", "团队协作", "创新实践"],
-    summary: "适合有项目想法、希望参加创新创业训练和赛事的同学。",
-  },
-  {
-    title: "实习实践",
-    type: "实习实践",
-    deadline: "7月18日",
-    score: 5,
-    audience: ["就业导向", "岗位体验", "职业能力"],
-    summary: "适合希望提前了解岗位要求、积累实践经历和就业素材的同学。",
-  },
 ];
 
 function getOpportunityType(text: string) {
@@ -202,6 +133,7 @@ function makeSummary(text: string) {
 export default function OpportunitiesPage() {
   const [notice, setNotice] = useState("");
   const [activeFilter, setActiveFilter] = useState("全部");
+  const [opportunities, setOpportunities] = useState<Opportunity[]>(defaultOpportunities);
   const [latest, setLatest] = useState<OpportunityNotice[]>([]);
   const [latestError, setLatestError] = useState("");
   const [latestLoading, setLatestLoading] = useState(true);
@@ -218,12 +150,13 @@ export default function OpportunitiesPage() {
   const filteredHot = useMemo(
     () =>
       activeFilter === "全部"
-        ? hotOpportunities
-        : hotOpportunities.filter((item) => item.type === activeFilter),
-    [activeFilter],
+        ? opportunities
+        : opportunities.filter((item) => item.category === activeFilter),
+    [activeFilter, opportunities],
   );
 
   useEffect(() => {
+    setOpportunities(getOpportunities());
     const saved = window.localStorage.getItem("yanggong-opportunities-favorites");
     if (saved) {
       try {
@@ -401,6 +334,12 @@ ${article.content}
             <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-600">
               聚合班主任助理、学生组织、社团招新、志愿服务、校园活动、技能竞赛、创新创业、实习实践等成长机会，通过 AI 自动分析参与价值与行动建议。
             </p>
+            <Link
+              href="/opportunity-admin"
+              className="mt-5 inline-flex rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-3 text-sm font-black text-white shadow-glow transition hover:-translate-y-0.5 active:scale-95"
+            >
+              管理机会
+            </Link>
           </div>
         </section>
 
@@ -446,7 +385,7 @@ ${article.content}
           <div className="mt-4 grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
             {filteredHot.map((item, index) => (
               <motion.article
-                key={item.title}
+                key={item.id}
                 initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -454,17 +393,25 @@ ${article.content}
                 className="premium-card group p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
               >
                 <div className="mb-4 flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-black text-white">{item.type}</span>
+                  <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-black text-white">{item.category}</span>
                   <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">截止：{item.deadline}</span>
+                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">{item.status}</span>
                 </div>
                 <h3 className="text-2xl font-black text-slate-950">{item.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-slate-600">{item.summary}</p>
+                <p className="mt-3 text-sm leading-7 text-slate-600">{item.description}</p>
                 <div className="mt-4 grid gap-2 text-sm font-black text-slate-700">
-                  <span>推荐指数：{stars(item.score)}</span>
+                  <span>推荐指数：{stars(item.recommendLevel)}</span>
                   <div className="flex flex-wrap gap-2">
-                    {item.audience.map((tag) => (
+                    {item.targetAudience.map((tag) => (
                       <span key={tag} className="rounded-full bg-blue-50 px-3 py-1 text-xs text-blue-700">
                         {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {item.tags.map((tag) => (
+                      <span key={tag} className="rounded-full bg-white/80 px-3 py-1 text-xs text-slate-500">
+                        #{tag}
                       </span>
                     ))}
                   </div>
@@ -480,8 +427,8 @@ ${article.content}
                         title: item.title,
                         date: item.deadline,
                         url: "",
-                        type: item.type,
-                        summary: item.summary,
+                        type: item.category,
+                        summary: `${item.description}\n报名条件：${item.requirements}\n报名方式：${item.applyMethod}\n来源：${item.source}`,
                       })
                     }
                     disabled={aiLoadingUrl === item.title}
@@ -492,7 +439,7 @@ ${article.content}
                   </button>
                   <button
                     type="button"
-                    onClick={() => saveFavorite({ title: item.title, type: item.type, deadline: item.deadline })}
+                    onClick={() => saveFavorite({ title: item.title, type: item.category, deadline: item.deadline })}
                     className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-2 text-sm font-black text-amber-700 hover:bg-amber-100 active:scale-95"
                   >
                     <Bookmark className="size-4" />

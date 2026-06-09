@@ -244,7 +244,7 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
 
   return (
     <div className="grid min-w-0 gap-5">
-      <div className="relative min-w-0 overflow-hidden rounded-[24px] border border-white/80 bg-white/60 p-3 shadow-[0_30px_110px_rgba(37,99,235,0.18)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_42px_130px_rgba(37,99,235,0.26)] sm:rounded-[32px] sm:p-5">
+      <div className="relative min-w-0 overflow-visible rounded-[20px] border border-white/80 bg-white/60 p-2 shadow-[0_30px_110px_rgba(37,99,235,0.18)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_42px_130px_rgba(37,99,235,0.26)] min-[769px]:overflow-hidden min-[769px]:rounded-[32px] min-[769px]:p-5">
         <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-28 right-12 h-96 w-96 rounded-full bg-cyan-300/20 blur-3xl" />
         <div className="relative z-10 mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
@@ -297,9 +297,9 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
           </div>
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-[1200px] rounded-[20px] border border-white/90 bg-gradient-to-br from-sky-50 via-white to-cyan-50 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_0_70px_rgba(56,189,248,0.2)] sm:rounded-[32px]">
-          <div className="pointer-events-none absolute inset-0 rounded-[20px] ring-1 ring-inset ring-white/95 sm:rounded-[32px]" />
-          <div className="relative w-full overflow-hidden rounded-[18px] sm:rounded-[28px]">
+        <div className="relative z-10 mx-auto w-full max-w-[1200px] overflow-visible rounded-[20px] border border-white/90 bg-gradient-to-br from-sky-50 via-white to-cyan-50 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_0_70px_rgba(56,189,248,0.2)] min-[769px]:rounded-[32px]">
+          <div className="pointer-events-none absolute inset-0 rounded-[20px] ring-1 ring-inset ring-white/95 min-[769px]:rounded-[32px]" />
+          <div className="relative w-full overflow-visible rounded-[18px] min-[769px]:rounded-[28px]">
             <Image
               src="/campus-map.png"
               alt="校园地图"
@@ -310,7 +310,7 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
               className="block h-auto w-full object-contain"
             />
 
-            <div className="absolute inset-0">
+            <div className="pointer-events-none absolute inset-0">
               {visibleHotspots.map((hotspot) => {
                 const isActive = hotspot.id === activeMapId;
                 const isLocating = hotspot.id === locatingId;
@@ -320,7 +320,7 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
                     type="button"
                     onClick={() => onSelect(hotspot.id)}
                     className={cn(
-                      "group absolute z-10 grid place-items-center rounded-full transition-all duration-300",
+                      "group pointer-events-auto absolute z-10 grid place-items-center rounded-full transition-all duration-300",
                       activeMapId && !isActive && "opacity-70",
                       isActive ? "z-40" : "hover:z-30",
                     )}
@@ -334,9 +334,9 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
                   >
                     <span
                       className={cn(
-                        "relative grid size-7 place-items-center rounded-full border border-blue-200/90 bg-white/78 text-sm shadow-lg backdrop-blur-xl transition-all duration-300 group-hover:scale-[1.15] group-hover:border-blue-300 group-hover:bg-white/92 group-hover:shadow-xl md:size-9 md:text-base xl:size-11 xl:text-xl",
+                        "relative grid size-7 place-items-center rounded-full border border-blue-200/90 bg-white/78 text-sm shadow-lg backdrop-blur-xl transition-all duration-300 group-hover:scale-[1.15] group-hover:border-blue-300 group-hover:bg-white/92 group-hover:shadow-xl min-[769px]:size-9 min-[769px]:text-base xl:size-11 xl:text-xl",
                         isActive &&
-                          "size-9 border-blue-400 bg-white text-base ring-4 ring-blue-300/70 shadow-[0_0_42px_rgba(37,99,235,0.72)] md:size-12 md:text-xl xl:size-[60px] xl:text-2xl",
+                          "size-[38px] border-blue-400 bg-white text-lg ring-4 ring-blue-300/70 shadow-[0_0_42px_rgba(37,99,235,0.72)] min-[769px]:size-12 min-[769px]:text-xl xl:size-[60px] xl:text-2xl",
                         (isLocating || isActive) && "animate-pulse",
                       )}
                     >
@@ -348,7 +348,7 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
                       )}
                       <span className="relative leading-none drop-shadow-sm">{hotspot.icon}</span>
                     </span>
-                    <span className="pointer-events-none absolute bottom-full left-1/2 mb-3 hidden min-w-max -translate-x-1/2 rounded-xl bg-slate-950 px-3 py-1.5 text-xs font-black text-white opacity-0 shadow-xl transition-all duration-200 group-hover:-translate-y-1 group-hover:opacity-100 md:block">
+                    <span className="pointer-events-none absolute bottom-full left-1/2 mb-3 hidden min-w-max -translate-x-1/2 rounded-xl bg-slate-950 px-3 py-1.5 text-xs font-black text-white opacity-0 shadow-xl transition-all duration-200 group-hover:-translate-y-1 group-hover:opacity-100 min-[769px]:block">
                       {hotspotMeta[hotspot.id].title}
                     </span>
                     {DEBUG_MAP && (
@@ -364,14 +364,14 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
             </div>
 
             {locatingId && (
-              <div className="absolute left-3 top-3 z-20 hidden rounded-2xl border border-white/70 bg-white/86 px-4 py-3 shadow-card-light backdrop-blur-xl md:block">
+              <div className="absolute left-3 top-3 z-20 hidden rounded-2xl border border-white/70 bg-white/86 px-4 py-3 shadow-card-light backdrop-blur-xl min-[769px]:block">
                 <p className="text-xs font-bold text-blue-600">📍 已定位：</p>
                 <p className="mt-1 text-sm font-black text-slate-950">
                   {hotspotMeta[locatingId].title}
                 </p>
               </div>
             )}
-            <div className="absolute right-3 top-3 z-20 hidden rounded-2xl border border-white/80 bg-white/86 px-4 py-3 shadow-card-light backdrop-blur-xl md:block">
+            <div className="absolute right-3 top-3 z-20 hidden rounded-2xl border border-white/80 bg-white/86 px-4 py-3 shadow-card-light backdrop-blur-xl min-[769px]:block">
               <p className="text-xs font-black text-blue-600">📍 当前定位</p>
               <p className="mt-1 max-w-[240px] truncate text-sm font-black text-slate-950">
                 {activeMeta.title}
@@ -380,7 +380,7 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
           </div>
         </div>
 
-        <div className="relative z-10 mt-3 rounded-2xl border border-white/70 bg-white/86 px-4 py-3 shadow-card-light backdrop-blur-xl md:hidden">
+        <div className="relative z-10 mt-3 rounded-2xl border border-white/70 bg-white/86 px-4 py-3 shadow-card-light backdrop-blur-xl min-[769px]:hidden">
           <p className="text-xs font-black text-blue-600">📍 当前定位</p>
           <p className="mt-1 text-sm font-black text-slate-950">{activeMeta.title}</p>
         </div>

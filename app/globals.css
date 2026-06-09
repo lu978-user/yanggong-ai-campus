@@ -28,6 +28,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 html,
@@ -40,6 +41,7 @@ body {
 body {
   min-height: 100vh;
   margin: 0;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at 8% 8%, rgba(59, 130, 246, 0.16), transparent 28%),
     radial-gradient(circle at 86% 12%, rgba(45, 212, 191, 0.16), transparent 30%),
@@ -346,4 +348,27 @@ a:active,
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+.admin-input {
+  min-height: 48px;
+  width: 100%;
+  border-radius: 18px;
+  border: 1px solid rgba(191, 219, 254, 0.95);
+  background: rgba(255, 255, 255, 0.82);
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  outline: none;
+  transition:
+    border-color 300ms ease,
+    box-shadow 300ms ease,
+    background-color 300ms ease;
+}
+
+.admin-input:focus {
+  border-color: rgba(37, 99, 235, 0.75);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  background: rgba(255, 255, 255, 0.95);
 }
