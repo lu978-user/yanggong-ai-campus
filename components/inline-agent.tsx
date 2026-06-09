@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from "react";
 import { Bot, Loader2, Send } from "lucide-react";
+import { MarkdownResponse } from "@/components/markdown-response";
+import { sanitizeResponse } from "@/lib/response-sanitizer";
 
 const FAILURE_MESSAGE = "暂时无法连接智能体，请稍后再试。";
 
@@ -39,7 +41,7 @@ export function InlineAgent({
       if (!response.ok) throw new Error(data.answer || FAILURE_MESSAGE);
 
       setConversationId(data.conversationId ?? "");
-      setAnswer(data.answer || "已收到请求。");
+      setAnswer(sanitizeResponse(data.answer || "已收到请求。"));
     } catch {
       setAnswer(FAILURE_MESSAGE);
     } finally {
@@ -97,7 +99,7 @@ export function InlineAgent({
 
       {(answer || loading) && (
         <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50/70 p-4 text-sm leading-7 text-slate-700">
-          {loading ? "正在请求智能体..." : answer}
+          {loading ? "正在请求智能体..." : <MarkdownResponse text={answer} />}
         </div>
       )}
     </section>

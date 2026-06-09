@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { CountUp } from "@/components/count-up";
+import { sanitizeResponse } from "@/lib/response-sanitizer";
 
 type OpportunityNotice = {
   title: string;
@@ -266,7 +267,7 @@ export default function OpportunitiesPage() {
       });
       const data = (await response.json()) as { answer?: string };
       if (!response.ok) throw new Error("failed");
-      setAiAnswer(data.answer || "已完成解读。");
+      setAiAnswer(sanitizeResponse(data.answer || "已完成解读。"));
     } catch {
       setAiAnswer("暂时无法连接智能体，请稍后再试。");
     } finally {

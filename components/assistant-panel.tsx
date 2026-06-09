@@ -2,6 +2,8 @@
 
 import { FormEvent, useRef, useState } from "react";
 import { Bot, Loader2, Send, UserRound } from "lucide-react";
+import { MarkdownResponse } from "@/components/markdown-response";
+import { sanitizeResponse } from "@/lib/response-sanitizer";
 import { cn } from "@/lib/utils";
 
 type Message = {
@@ -58,7 +60,7 @@ export function AssistantPanel() {
       setConversationId(data.conversationId ?? "");
       setMessages((current) => [
         ...current,
-        { id: createId(), role: "assistant", content: data.answer || "已收到请求。" },
+        { id: createId(), role: "assistant", content: sanitizeResponse(data.answer || "已收到请求。") },
       ]);
     } catch {
       setMessages((current) => [
@@ -127,7 +129,11 @@ export function AssistantPanel() {
                   : "border border-blue-100 bg-blue-50/80 text-slate-700",
               )}
             >
-              {message.content}
+              {message.role === "assistant" ? (
+                <MarkdownResponse text={message.content} />
+              ) : (
+                message.content
+              )}
             </div>
             {message.role === "user" && (
               <span className="grid size-8 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-700">

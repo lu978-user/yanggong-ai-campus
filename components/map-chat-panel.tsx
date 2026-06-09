@@ -4,6 +4,8 @@ import { FormEvent, useRef, useState } from "react";
 import { Bot, Loader2, Send, Sparkles, UserRound } from "lucide-react";
 import { motion } from "framer-motion";
 import { type MapHotspotId } from "@/data/map-hotspots";
+import { MarkdownResponse } from "@/components/markdown-response";
+import { sanitizeResponse } from "@/lib/response-sanitizer";
 import { cn } from "@/lib/utils";
 
 type Message = {
@@ -83,7 +85,7 @@ export function MapChatPanel({ onMapId }: MapChatPanelProps) {
         {
           id: createId(),
           role: "assistant",
-          content: data.answer || "已收到请求，但暂时没有可展示的回答。",
+          content: sanitizeResponse(data.answer || "已收到请求，但暂时没有可展示的回答。"),
         },
       ]);
     } catch {
@@ -163,7 +165,11 @@ export function MapChatPanel({ onMapId }: MapChatPanelProps) {
                   : "border border-blue-100 bg-blue-50/80 text-slate-700",
               )}
             >
-              {message.content}
+              {message.role === "assistant" ? (
+                <MarkdownResponse text={message.content} />
+              ) : (
+                message.content
+              )}
             </div>
             {message.role === "user" && (
               <span className="grid size-8 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-700">
