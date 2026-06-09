@@ -33,7 +33,7 @@ export default function MapPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[1920px] px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1920px] overflow-x-hidden px-3 py-5 sm:px-6 lg:px-8">
         <section className="relative mb-6 overflow-hidden rounded-[36px] border border-white/70 bg-white/76 p-6 shadow-xl backdrop-blur-2xl">
           <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-cyan-300/25 blur-3xl" />
           <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
@@ -63,8 +63,8 @@ export default function MapPage() {
           <MetricCard icon={UsersRound} label="服务对象" value="全体在校学生" />
         </section>
 
-        <div className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_420px]">
-          <div className="space-y-5">
+        <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,7fr)_minmax(340px,3fr)]">
+          <div className="min-w-0 space-y-5">
             <CampusMap
               activeMapId={activeMapId}
               routeMapId={routeMapId}
@@ -91,7 +91,9 @@ export default function MapPage() {
             </section>
           </div>
 
-          <MapChatPanel onMapId={handleAiMapId} />
+          <div className="min-w-0 xl:sticky xl:top-6 xl:self-start">
+            <MapChatPanel onMapId={handleAiMapId} />
+          </div>
         </div>
       </div>
     </AppShell>

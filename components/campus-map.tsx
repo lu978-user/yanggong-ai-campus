@@ -243,14 +243,14 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
   }
 
   return (
-    <div className="grid min-h-0 gap-5">
-      <div className="relative overflow-hidden rounded-[32px] border border-white/80 bg-white/60 p-4 shadow-[0_30px_110px_rgba(37,99,235,0.18)] backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_42px_130px_rgba(37,99,235,0.26)] sm:p-5">
+    <div className="grid min-w-0 gap-5">
+      <div className="relative min-w-0 overflow-hidden rounded-[24px] border border-white/80 bg-white/60 p-3 shadow-[0_30px_110px_rgba(37,99,235,0.18)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_42px_130px_rgba(37,99,235,0.26)] sm:rounded-[32px] sm:p-5">
         <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-28 right-12 h-96 w-96 rounded-full bg-cyan-300/20 blur-3xl" />
-        <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <div className="relative z-10 mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <form
             onSubmit={handleSearch}
-            className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-blue-100 bg-white/86 px-4 py-3 shadow-sm"
+            className="flex min-w-0 flex-1 items-center gap-2 rounded-2xl border border-blue-100 bg-white/86 px-3 py-3 shadow-sm sm:gap-3 sm:px-4"
           >
             <Search className="size-5 shrink-0 text-blue-500" />
             <label className="sr-only" htmlFor="campus-map-search">
@@ -265,20 +265,20 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
             />
             <button
               type="submit"
-              className="rounded-full bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700"
+              className="shrink-0 rounded-full bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700"
             >
               定位
             </button>
           </form>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 xl:flex-wrap xl:overflow-visible xl:pb-0">
             {layers.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => setLayer(item.id)}
                 className={cn(
-                  "relative overflow-hidden rounded-full px-3 py-2 text-xs font-bold transition-all duration-300",
+                  "relative shrink-0 overflow-hidden whitespace-nowrap rounded-full px-3 py-2 text-xs font-bold transition-all duration-300",
                   layer === item.id
                     ? "text-white shadow-sm"
                     : "border border-blue-100 bg-white/75 text-slate-600 hover:bg-blue-50 hover:text-blue-700",
@@ -297,72 +297,92 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
           </div>
         </div>
 
-        <div className="relative mx-auto overflow-hidden rounded-[32px] border border-white/90 bg-gradient-to-br from-sky-50 via-white to-cyan-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_0_70px_rgba(56,189,248,0.2)] xl:w-[80%]">
-          <div className="pointer-events-none absolute inset-0 rounded-[32px] ring-1 ring-inset ring-white/95" />
-          <div className="relative h-[520px] w-full sm:h-[620px] xl:h-[720px]">
+        <div className="relative z-10 mx-auto w-full max-w-[1200px] rounded-[20px] border border-white/90 bg-gradient-to-br from-sky-50 via-white to-cyan-50 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_0_70px_rgba(56,189,248,0.2)] sm:rounded-[32px]">
+          <div className="pointer-events-none absolute inset-0 rounded-[20px] ring-1 ring-inset ring-white/95 sm:rounded-[32px]" />
+          <div className="relative w-full overflow-hidden rounded-[18px] sm:rounded-[28px]">
             <Image
               src="/campus-map.png"
               alt="校园地图"
-              fill
+              width={2048}
+              height={1152}
               priority
-              className="object-contain"
+              sizes="(min-width: 1280px) 1200px, 100vw"
+              className="block h-auto w-full object-contain"
             />
 
-            {visibleHotspots.map((hotspot) => {
-              const isActive = hotspot.id === activeMapId;
-              const isLocating = hotspot.id === locatingId;
-              return (
-                <button
-                  key={hotspot.id}
-                  type="button"
-                  onClick={() => onSelect(hotspot.id)}
-                  className={cn(
-                    "group absolute z-10 grid size-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-blue-200/90 bg-white/78 text-xl shadow-lg backdrop-blur-xl transition-all duration-300 hover:z-30 hover:scale-[1.15] hover:border-blue-300 hover:bg-white/92 hover:shadow-xl",
-                    activeMapId && !isActive && "opacity-80",
-                    isActive &&
-                      "z-40 scale-[1.45] border-blue-400 bg-white opacity-100 ring-4 ring-blue-300/70 shadow-[0_0_42px_rgba(37,99,235,0.72)]",
-                    (isLocating || isActive) && "animate-pulse",
-                  )}
-                  style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%` }}
-                  aria-label={hotspotMeta[hotspot.id].title}
-                  title={hotspotMeta[hotspot.id].title}
-                >
-                  {isActive && (
-                    <>
-                      <span className="animate-pulse-ring pointer-events-none absolute inset-0 rounded-full border-2 border-blue-400" />
-                      <span className="pointer-events-none absolute inset-[-12px] rounded-full bg-blue-400/30 blur-lg" />
-                    </>
-                  )}
-                  <span className="relative leading-none drop-shadow-sm">{hotspot.icon}</span>
-                  <span className="pointer-events-none absolute bottom-full left-1/2 mb-3 min-w-max -translate-x-1/2 rounded-xl bg-slate-950 px-3 py-1.5 text-xs font-black text-white opacity-0 shadow-xl transition-all duration-200 group-hover:-translate-y-1 group-hover:opacity-100">
-                    {hotspotMeta[hotspot.id].title}
-                  </span>
-                  {DEBUG_MAP && (
-                    <span className="pointer-events-none absolute left-1/2 top-full mt-2 min-w-max -translate-x-1/2 rounded-lg bg-white/90 px-2 py-1 text-[10px] font-black leading-4 text-blue-700 shadow-sm">
-                      {hotspot.id}
-                      <br />
-                      {hotspot.x},{hotspot.y}
+            <div className="absolute inset-0">
+              {visibleHotspots.map((hotspot) => {
+                const isActive = hotspot.id === activeMapId;
+                const isLocating = hotspot.id === locatingId;
+                return (
+                  <button
+                    key={hotspot.id}
+                    type="button"
+                    onClick={() => onSelect(hotspot.id)}
+                    className={cn(
+                      "group absolute z-10 grid place-items-center rounded-full transition-all duration-300",
+                      activeMapId && !isActive && "opacity-70",
+                      isActive ? "z-40" : "hover:z-30",
+                    )}
+                    style={{
+                      left: `${hotspot.x}%`,
+                      top: `${hotspot.y}%`,
+                      transform: "translate(-50%, -50%)",
+                    }}
+                    aria-label={hotspotMeta[hotspot.id].title}
+                    title={hotspotMeta[hotspot.id].title}
+                  >
+                    <span
+                      className={cn(
+                        "relative grid size-7 place-items-center rounded-full border border-blue-200/90 bg-white/78 text-sm shadow-lg backdrop-blur-xl transition-all duration-300 group-hover:scale-[1.15] group-hover:border-blue-300 group-hover:bg-white/92 group-hover:shadow-xl md:size-9 md:text-base xl:size-11 xl:text-xl",
+                        isActive &&
+                          "size-9 border-blue-400 bg-white text-base ring-4 ring-blue-300/70 shadow-[0_0_42px_rgba(37,99,235,0.72)] md:size-12 md:text-xl xl:size-[60px] xl:text-2xl",
+                        (isLocating || isActive) && "animate-pulse",
+                      )}
+                    >
+                      {isActive && (
+                        <>
+                          <span className="animate-pulse-ring pointer-events-none absolute inset-0 rounded-full border-2 border-blue-400" />
+                          <span className="pointer-events-none absolute inset-[-12px] rounded-full bg-blue-400/30 blur-lg" />
+                        </>
+                      )}
+                      <span className="relative leading-none drop-shadow-sm">{hotspot.icon}</span>
                     </span>
-                  )}
-                </button>
-              );
-            })}
+                    <span className="pointer-events-none absolute bottom-full left-1/2 mb-3 hidden min-w-max -translate-x-1/2 rounded-xl bg-slate-950 px-3 py-1.5 text-xs font-black text-white opacity-0 shadow-xl transition-all duration-200 group-hover:-translate-y-1 group-hover:opacity-100 md:block">
+                      {hotspotMeta[hotspot.id].title}
+                    </span>
+                    {DEBUG_MAP && (
+                      <span className="pointer-events-none absolute left-1/2 top-full mt-2 min-w-max -translate-x-1/2 rounded-lg bg-white/90 px-2 py-1 text-[10px] font-black leading-4 text-blue-700 shadow-sm">
+                        {hotspot.id}
+                        <br />
+                        {hotspot.x},{hotspot.y}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
 
             {locatingId && (
-              <div className="absolute left-5 top-5 z-20 rounded-2xl border border-white/70 bg-white/86 px-4 py-3 shadow-card-light backdrop-blur-xl">
+              <div className="absolute left-3 top-3 z-20 hidden rounded-2xl border border-white/70 bg-white/86 px-4 py-3 shadow-card-light backdrop-blur-xl md:block">
                 <p className="text-xs font-bold text-blue-600">📍 已定位：</p>
                 <p className="mt-1 text-sm font-black text-slate-950">
                   {hotspotMeta[locatingId].title}
                 </p>
               </div>
             )}
-            <div className="absolute right-5 top-5 z-20 rounded-2xl border border-white/80 bg-white/86 px-4 py-3 shadow-card-light backdrop-blur-xl">
+            <div className="absolute right-3 top-3 z-20 hidden rounded-2xl border border-white/80 bg-white/86 px-4 py-3 shadow-card-light backdrop-blur-xl md:block">
               <p className="text-xs font-black text-blue-600">📍 当前定位</p>
               <p className="mt-1 max-w-[240px] truncate text-sm font-black text-slate-950">
                 {activeMeta.title}
               </p>
             </div>
           </div>
+        </div>
+
+        <div className="relative z-10 mt-3 rounded-2xl border border-white/70 bg-white/86 px-4 py-3 shadow-card-light backdrop-blur-xl md:hidden">
+          <p className="text-xs font-black text-blue-600">📍 当前定位</p>
+          <p className="mt-1 text-sm font-black text-slate-950">{activeMeta.title}</p>
         </div>
       </div>
 
@@ -393,7 +413,7 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
           {visualHotspotIds.includes(activeHotspot.id) && (
             <div className="mb-5 grid gap-4 lg:grid-cols-[280px_1fr]">
               <div className="relative min-h-[180px] overflow-hidden rounded-[24px] border border-white/80 bg-blue-50 shadow-inner">
-                <Image src="/campus-map.png" alt={`${activeMeta.title}地图预览`} fill className="object-cover" />
+                <Image src="/campus-map.png" alt={`${activeMeta.title}地图预览`} fill className="object-contain" />
                 <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-blue-950/10" />
                 <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-white/82 p-3 shadow-sm backdrop-blur-xl">
                   <p className="flex items-center gap-2 text-xs font-black text-blue-700">

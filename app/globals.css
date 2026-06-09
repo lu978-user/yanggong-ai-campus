@@ -339,3 +339,11 @@ a:active,
 .typing-dot:nth-child(3) {
   animation-delay: 0.32s;
 }
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

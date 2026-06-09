@@ -111,7 +111,7 @@ export function MapChatPanel({ onMapId }: MapChatPanelProps) {
   }
 
   return (
-    <aside className="flex min-h-[760px] flex-col rounded-[24px] border border-white/70 bg-white/76 shadow-card-light backdrop-blur-2xl">
+    <aside className="flex min-h-[560px] min-w-0 flex-col rounded-[24px] border border-white/70 bg-white/76 shadow-card-light backdrop-blur-2xl xl:min-h-[760px]">
       <div className="border-b border-blue-100/80 px-5 py-4">
         <div className="flex items-center gap-3">
           <span className="grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 text-white shadow-glow">
@@ -143,7 +143,7 @@ export function MapChatPanel({ onMapId }: MapChatPanelProps) {
         </div>
       </div>
 
-      <div ref={listRef} className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
+      <div ref={listRef} className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-5">
         {messages.map((message) => (
           <motion.div
             key={message.id}
@@ -159,7 +159,7 @@ export function MapChatPanel({ onMapId }: MapChatPanelProps) {
             )}
             <div
               className={cn(
-                "max-w-[84%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-7 shadow-sm",
+                "max-w-[84%] min-w-0 whitespace-pre-wrap break-words rounded-2xl px-4 py-3 text-sm leading-7 shadow-sm",
                 message.role === "user"
                   ? "bg-blue-600 text-white"
                   : "border border-blue-100 bg-blue-50/80 text-slate-700",
