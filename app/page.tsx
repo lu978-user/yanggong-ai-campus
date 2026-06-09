@@ -8,6 +8,7 @@ import {
   BookOpen,
   Brain,
   CheckCircle2,
+  CircleDot,
   GraduationCap,
   MapPinned,
   Megaphone,
@@ -31,14 +32,14 @@ const serviceCards = [
   {
     title: "校园导航",
     icon: MapPinned,
-    desc: "AI定位校园地点，联动PNG地图热点与外部地图导航。",
+    desc: "作为基础服务能力保留，支持校园地点查询、PNG地图热点定位与外部导航。",
     href: "/map",
     gradient: "from-blue-600 to-cyan-500",
   },
   {
-    title: "校园机会",
+    title: "机会发现",
     icon: Megaphone,
-    desc: "解读招聘、社团、志愿、讲座、比赛和勤工助学通知。",
+    desc: "发现班助、学生组织、社团、志愿、竞赛、实习实践等成长机会。",
     href: "/opportunities",
     gradient: "from-cyan-500 to-emerald-500",
   },
@@ -77,9 +78,11 @@ const platformHighlights = ["Dify Chatflow", "mapId 热点定位", "校园知识
 const recommendedPath = [
   "查询图书馆位置",
   "获取专业成长规划",
-  "解读校园机会通知",
+  "解读成长机会通知",
   "查询学生事务流程",
 ];
+
+const growthLoop = ["成长规划", "机会发现", "参与实践", "能力提升", "就业升学"];
 
 export default function DashboardPage() {
   return (
@@ -98,7 +101,7 @@ export default function DashboardPage() {
               <div>
                 <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/80 px-4 py-2 text-sm font-black text-blue-700 shadow-sm backdrop-blur-xl">
                   <Sparkles className="size-4" />
-                  YangGong AI Campus V5
+                  发现机会 · 规划成长 · 智慧校园
                 </div>
                 <motion.h1
                   initial={{ opacity: 0, y: 18 }}
@@ -114,13 +117,13 @@ export default function DashboardPage() {
                   transition={{ delay: 0.1, duration: 0.45, ease: "easeOut" }}
                   className="mt-4 text-2xl font-black text-blue-700 sm:text-3xl"
                 >
-                  AI校园公益服务平台
+                  大学生成长机会与关怀服务平台
                 </motion.p>
                 <p className="mt-3 text-lg font-black text-slate-800">
-                  AI驱动的校园导航、成长规划与公益服务平台
+                  帮助学生发现机会、规划成长、获取资源、获得支持。
                 </p>
                 <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-                  集校园导航、成长规划、学习资源、校园机会与智能问答于一体，为扬州工业职业技术学院学生提供公益化、智能化、可持续的校园服务。
+                  在保留校园导航、学生事务、安全教育等基础服务的同时，突出成长规划、机会发现、学习资源与成长关怀，让校园信息从“能查询”升级为“能指导、能陪伴”。
                 </p>
                 <div className="mt-6 inline-flex rounded-2xl border border-blue-100 bg-white/78 px-5 py-3 text-sm font-black text-slate-800 shadow-sm">
                   校训：厚德强能 · 笃学创新
@@ -238,23 +241,54 @@ export default function DashboardPage() {
 
           <section className="grid gap-5 xl:grid-cols-[1fr_380px]">
             <div className="premium-card p-6">
-              <p className="text-sm font-black text-blue-600">V5 Platform Value</p>
-              <h2 className="mt-1 text-3xl font-black text-slate-950">不是聊天机器人，而是校园服务平台</h2>
+              <p className="text-sm font-black text-blue-600">Growth Companion Platform</p>
+              <h2 className="mt-1 text-3xl font-black text-slate-950">不是单纯工具，而是成长陪伴平台</h2>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {["校园地点查询", "通知机会解读", "专业成长规划", "安全心理公益支持"].map((item) => (
+                {["成长规划建议", "成长机会解读", "学习资源推荐", "安全心理关怀"].map((item) => (
                   <div key={item} className="rounded-2xl border border-blue-100 bg-blue-50/45 p-4">
                     <p className="font-black text-slate-950">{item}</p>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">由知识库、意图分类与Dify智能体共同支撑。</p>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">围绕成长、机会、陪伴构建，校园导航作为基础能力持续保留。</p>
                   </div>
                 ))}
               </div>
             </div>
             <InlineAgent
-              title="AI助手入口"
-              description="围绕校园导航、学习成长、学生事务、安全教育和心理关怀，直接向扬工智行提问。"
-              placeholder="例如：我是大一新生，今天应该先了解哪些校园服务？"
-              suggested={["文汇楼（图书馆）在哪", "学生证丢了怎么办", "大一成长规划", "最近压力大怎么办"]}
+              title="AI成长导师入口"
+              description="围绕成长规划、竞赛证书、成长机会、学习资源与心理关怀，获取更有陪伴感的建议。"
+              placeholder="例如：我是大一新生，如何规划成长和参与成长机会？"
+              suggested={["大一成长规划", "蓝桥杯怎么准备", "最近有哪些机会", "最近压力大怎么办"]}
             />
+          </section>
+
+          <section className="premium-card p-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-sm font-black text-blue-600">Growth Loop</p>
+                <h2 className="mt-1 text-3xl font-black text-slate-950">成长闭环</h2>
+              </div>
+              <p className="text-sm font-bold text-slate-500">从规划到行动，再到能力沉淀</p>
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-5">
+              {growthLoop.map((item, index) => (
+                <motion.div
+                  key={item}
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05 }}
+                  className="relative rounded-[24px] border border-blue-100 bg-white/72 p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                >
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-3 py-1 text-xs font-black text-white">
+                    <CircleDot className="size-3.5" />
+                    0{index + 1}
+                  </div>
+                  <p className="text-base font-black text-slate-950">{item}</p>
+                  {index < growthLoop.length - 1 && (
+                    <span className="absolute -right-3 top-1/2 hidden -translate-y-1/2 text-xl font-black text-blue-400 md:block">↓</span>
+                  )}
+                </motion.div>
+              ))}
+            </div>
           </section>
 
           <section className="premium-card p-6">

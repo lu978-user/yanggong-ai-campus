@@ -19,15 +19,15 @@ const FAILURE_MESSAGE = "暂时无法连接智能体，请稍后再试。";
 const promptGroups = [
   {
     title: "猜你想问",
-    items: ["文汇楼（图书馆）在哪", "西门在哪", "体育馆在哪", "双镜湖在哪"],
+    items: ["我是大一新生怎么规划", "适合我的竞赛有哪些", "最近有哪些成长机会", "学习资源怎么找"],
   },
   {
     title: "热门咨询",
-    items: ["学生证丢了怎么办", "大一怎么规划", "蓝桥杯怎么准备", "最近压力大怎么办"],
+    items: ["蓝桥杯怎么准备", "证书怎么规划", "专转本怎么准备", "最近压力大怎么办"],
   },
   {
     title: "最近咨询",
-    items: ["食堂在哪", "宿舍安全注意事项", "专转本建议", "校园卡问题"],
+    items: ["文汇楼（图书馆）在哪", "学生证丢了怎么办", "宿舍安全注意事项", "校园卡问题"],
   },
 ];
 
@@ -41,7 +41,7 @@ export default function ChatPage() {
       id: "welcome",
       role: "assistant",
       content:
-        "你好，我是扬工智行。你可以咨询校园导航、校园生活、学习成长、校园文化、安全关怀和学生事务，我会结合校园知识库持续对话。",
+        "你好，我是扬工智行 AI成长导师。你可以咨询成长规划、竞赛推荐、证书推荐、成长机会、学习资源和心理关怀，我会结合校园知识库持续陪伴你规划下一步。",
     },
   ]);
   const [input, setInput] = useState("");
@@ -111,10 +111,10 @@ export default function ChatPage() {
             <div className="mb-4 grid size-12 place-items-center rounded-2xl bg-blue-600 text-white">
               <Bot className="size-6" />
             </div>
-            <p className="text-sm font-black text-blue-600">AI Assistant</p>
-            <h1 className="mt-2 text-3xl font-black text-slate-950">校园公益服务助手</h1>
+            <p className="text-sm font-black text-blue-600">AI Growth Mentor</p>
+            <h1 className="mt-2 text-3xl font-black text-slate-950">AI成长导师</h1>
             <p className="mt-3 text-sm leading-7 text-slate-600">
-              参考 Claude / Kimi 式工作台体验，保留 Dify conversationId 上下文记忆，适合比赛现场连续演示。
+              聚焦成长规划、竞赛推荐、证书推荐、成长机会、学习资源与心理关怀，保留 Dify conversationId 上下文记忆。
             </p>
           </section>
 
@@ -144,7 +144,7 @@ export default function ChatPage() {
           <div className="flex items-center justify-between gap-4 border-b border-blue-100/80 px-5 py-4">
             <div>
               <p className="text-xs font-black text-blue-600">YangGong AI Campus</p>
-              <h2 className="text-xl font-black text-slate-950">连续对话工作区</h2>
+              <h2 className="text-xl font-black text-slate-950">成长陪伴对话区</h2>
             </div>
             <button
               type="button"
@@ -223,7 +223,7 @@ export default function ChatPage() {
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
                 rows={1}
-                placeholder="输入校园服务问题，或点击左侧快捷问题..."
+                placeholder="输入成长、机会、资源或关怀问题，或点击左侧快捷问题..."
                 className="min-h-12 flex-1 resize-none rounded-[24px] bg-transparent px-3 py-3 text-sm outline-none placeholder:text-slate-400 transition focus:bg-white/80 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.14)]"
               />
               <button
@@ -237,7 +237,7 @@ export default function ChatPage() {
               </button>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              {["校园导航", "成长规划", "学生事务", "心理关怀"].map((item) => (
+              {["成长规划", "成长机会", "学习资源", "心理关怀"].map((item) => (
                 <button
                   key={item}
                   type="button"

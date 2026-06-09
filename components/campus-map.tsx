@@ -16,7 +16,17 @@ type CampusMapProps = {
   onSelect: (id: MapHotspotId) => void;
 };
 
-type LayerId = "all" | "teaching" | "life" | "sport" | "landscape" | "gate";
+type LayerId =
+  | "all"
+  | "teaching"
+  | "library"
+  | "training"
+  | "canteen"
+  | "dorm"
+  | "sport"
+  | "landscape"
+  | "gate"
+  | "activity";
 
 type DisplayCategory = Exclude<LayerId, "all">;
 
@@ -25,6 +35,7 @@ type HotspotMeta = {
   alias: string;
   location: string;
   function: string;
+  functions: string[];
   nearby: string;
   route: string[];
   walkTime: string;
@@ -35,18 +46,26 @@ type HotspotMeta = {
 const layers: Array<{ id: LayerId; label: string }> = [
   { id: "all", label: "全部" },
   { id: "teaching", label: "教学楼" },
-  { id: "life", label: "生活服务" },
-  { id: "sport", label: "运动场馆" },
+  { id: "library", label: "图书馆" },
+  { id: "training", label: "实训中心" },
+  { id: "canteen", label: "食堂" },
+  { id: "dorm", label: "宿舍" },
+  { id: "sport", label: "体育设施" },
   { id: "landscape", label: "景观区域" },
   { id: "gate", label: "校门" },
+  { id: "activity", label: "校园服务" },
 ];
 
 const categoryLabels: Record<DisplayCategory, string> = {
   teaching: "教学楼",
-  life: "生活服务",
-  sport: "运动场馆",
+  library: "图书馆",
+  training: "实训中心",
+  canteen: "食堂",
+  dorm: "宿舍",
+  sport: "体育设施",
   landscape: "景观区域",
   gate: "校门",
+  activity: "校园服务",
 };
 
 const categoryStyles: Record<DisplayCategory, { pin: string; active: string; badge: string }> = {
@@ -55,10 +74,25 @@ const categoryStyles: Record<DisplayCategory, { pin: string; active: string; bad
     active: "ring-blue-300/55",
     badge: "bg-blue-50 text-blue-700",
   },
-  life: {
+  library: {
+    pin: "from-sky-500 to-blue-500",
+    active: "ring-sky-300/55",
+    badge: "bg-sky-50 text-sky-700",
+  },
+  training: {
+    pin: "from-indigo-500 to-violet-400",
+    active: "ring-indigo-300/55",
+    badge: "bg-indigo-50 text-indigo-700",
+  },
+  canteen: {
     pin: "from-emerald-500 to-teal-400",
     active: "ring-emerald-300/55",
     badge: "bg-emerald-50 text-emerald-700",
+  },
+  dorm: {
+    pin: "from-lime-500 to-emerald-400",
+    active: "ring-lime-300/55",
+    badge: "bg-lime-50 text-lime-700",
   },
   sport: {
     pin: "from-orange-500 to-amber-400",
@@ -75,27 +109,36 @@ const categoryStyles: Record<DisplayCategory, { pin: string; active: string; bad
     active: "ring-cyan-300/55",
     badge: "bg-cyan-50 text-cyan-700",
   },
+  activity: {
+    pin: "from-pink-500 to-violet-500",
+    active: "ring-pink-300/55",
+    badge: "bg-pink-50 text-pink-700",
+  },
 };
 
 function buildHotspotMeta(hotspot: MapHotspot): HotspotMeta {
   const route = ["北门", "校园主干道", hotspot.name];
   const categoryText = {
     gate: "校园出入口与到校定位",
-    study: "学习、自习、借阅与资料检索",
-    life: "校园生活与日常服务",
+    library: "图书借阅、自习、资料检索与学习空间",
+    training: "实训实践、技能训练与项目教学",
+    canteen: "学生就餐、生活补给与校园服务",
     sport: "体育课程、运动训练与活动集合",
     landscape: "校园景观、休闲与文化导览",
-    activity: "社团活动、学生组织与校园公益活动",
+    activity: "社团活动、学生组织、讲座交流与校园文化服务",
     teaching: "课程教学、实训实践与楼宇导览",
     dorm: "学生住宿、生活服务与安全关怀",
   }[hotspot.category];
+  const functions = hotspot.functions ?? [categoryText];
+  const nearby = hotspot.nearby?.join("、") ?? hotspot.alias.slice(0, 3).join("、") ?? "校园主干道";
 
   return {
     title: hotspot.name,
     alias: hotspot.alias.join(" / "),
     location: hotspot.description,
     function: categoryText,
-    nearby: hotspot.alias.slice(0, 3).join("、") || "校园主干道",
+    functions,
+    nearby,
     route,
     walkTime: hotspot.category === "gate" ? "3分钟" : "5-8分钟",
     bikeTime: hotspot.category === "gate" ? "2分钟" : "3-6分钟",
@@ -107,11 +150,7 @@ const hotspotMeta: Record<MapHotspotId, HotspotMeta> = Object.fromEntries(
   mapHotspots.map((hotspot) => [hotspot.id, buildHotspotMeta(hotspot)]),
 ) as Record<MapHotspotId, HotspotMeta>;
 function getDisplayCategory(hotspot: MapHotspot): DisplayCategory {
-  if (hotspot.category === "gate") return "gate";
-  if (hotspot.category === "sport") return "sport";
-  if (hotspot.category === "landscape") return "landscape";
-  if (["life", "dorm", "activity"].includes(hotspot.category)) return "life";
-  return "teaching";
+  return hotspot.category;
 }
 
 const visualHotspotIds: MapHotspotId[] = [
@@ -375,6 +414,7 @@ export function CampusMap({ activeMapId, routeMapId, onSelect }: CampusMapProps)
             {[
               ["建筑类型", categoryLabels[activeCategory]],
               ["简介", activeMeta.location],
+              ["主要功能", activeMeta.functions.join("、")],
               ["开放时间", activeMeta.openTime],
               ["附近建筑", activeMeta.nearby],
               ["路线规划", `${routeMeta.walkTime} / 骑行${routeMeta.bikeTime}`],

@@ -30,9 +30,21 @@ export type MapHotspot = {
   description: string;
   x: number;
   y: number;
-  category: "gate" | "study" | "life" | "sport" | "landscape" | "activity" | "teaching" | "dorm";
+  category:
+    | "gate"
+    | "library"
+    | "training"
+    | "canteen"
+    | "sport"
+    | "landscape"
+    | "activity"
+    | "teaching"
+    | "dorm";
   keywords: string[];
   icon: string;
+  functions?: string[];
+  nearby?: string[];
+  mapId?: MapHotspotId;
   amapKeyword?: string;
   baiduKeyword?: string;
 };
@@ -83,12 +95,12 @@ export const mapHotspots: MapHotspot[] = [
     id: "dingxiang_garden",
     name: "丁香园",
     alias: ["丁香园景观", "丁香园区域"],
-    description: "靠近东门的校园景观与休闲区域。",
+    description: "靠近东门的食堂区域，为学生提供日常就餐与校园生活服务。",
     x: 24,
     y: 27,
-    category: "landscape",
-    keywords: ["dingxiang_garden", "丁香园", "景观", "花园"],
-    icon: "🌊",
+    category: "canteen",
+    keywords: ["dingxiang_garden", "丁香园", "食堂", "餐厅", "就餐"],
+    icon: "🍽️",
     amapKeyword: `${schoolName} 丁香园`,
     baiduKeyword: `${schoolName} 丁香园`,
   },
@@ -151,7 +163,7 @@ export const mapHotspots: MapHotspot[] = [
     description: "标准地点为文筑楼，当前功能定位为实训中心，不再作为图书馆使用。",
     x: 49,
     y: 35,
-    category: "teaching",
+    category: "training",
     keywords: ["wenzhu_building", "文筑楼", "文筑", "实训中心", "实训"],
     icon: "🛠️",
     amapKeyword: `${schoolName} 文筑楼`,
@@ -203,7 +215,7 @@ export const mapHotspots: MapHotspot[] = [
     description: "文汇楼为校园图书馆所在建筑，提供自习、借阅、资料检索和学习空间服务。",
     x: 61,
     y: 55,
-    category: "study",
+    category: "library",
     keywords: ["wenhui_building", "文汇楼", "图书馆", "借书", "自习", "学习空间"],
     icon: "📚",
     amapKeyword: `${schoolName} 文汇楼 图书馆`,
@@ -278,38 +290,41 @@ export const mapHotspots: MapHotspot[] = [
     id: "activity_center",
     name: "大学生活动中心",
     alias: ["学生活动中心", "活动中心", "大学生活动中心"],
-    description: "社团活动、学生组织和校园公益活动的重要空间。",
+    description: "大学生活动中心是学生社团活动、校园文化活动、讲座交流和学生组织服务的重要空间。",
     x: 70,
     y: 49,
     category: "activity",
-    keywords: ["activity_center", "大学生活动中心", "活动中心", "社团", "学生会"],
+    keywords: ["activity_center", "大学生活动中心", "活动中心", "社团", "学生会", "校园讲座", "学生组织"],
     icon: "🎭",
+    functions: ["社团活动", "学生活动", "校园讲座", "学生组织服务", "校园文化交流"],
+    nearby: ["双镜湖", "二分桥", "文汇楼", "湖畔园"],
+    mapId: "activity_center",
     amapKeyword: `${schoolName} 大学生活动中心`,
     baiduKeyword: `${schoolName} 大学生活动中心`,
   },
   {
     id: "qinchun_garden",
     name: "沁春园",
-    alias: ["沁春园景观", "沁春园区域"],
-    description: "靠近西门与宿舍区的校园生活与景观节点。",
+    alias: ["沁春园", "沁春园食堂", "食堂区域"],
+    description: "沁春园为校园食堂区域，靠近西门与宿舍区，服务学生日常就餐。",
     x: 76,
     y: 62,
-    category: "landscape",
-    keywords: ["qinchun_garden", "沁春园", "景观", "花园"],
-    icon: "🌊",
+    category: "canteen",
+    keywords: ["qinchun_garden", "沁春园", "食堂", "餐厅", "就餐"],
+    icon: "🍽️",
     amapKeyword: `${schoolName} 沁春园`,
     baiduKeyword: `${schoolName} 沁春园`,
   },
   {
     id: "hupan_garden",
     name: "湖畔园",
-    alias: ["湖畔园景观", "湖畔区域"],
-    description: "双镜湖附近的休闲景观区域，可用于校园文化导览。",
+    alias: ["湖畔园", "湖畔园食堂", "食堂区域"],
+    description: "湖畔园为双镜湖附近的食堂区域，承担学生就餐与校园生活服务。",
     x: 72,
     y: 55,
-    category: "landscape",
-    keywords: ["hupan_garden", "湖畔园", "湖畔", "景观"],
-    icon: "🌊",
+    category: "canteen",
+    keywords: ["hupan_garden", "湖畔园", "湖畔", "食堂", "餐厅", "就餐"],
+    icon: "🍽️",
     amapKeyword: `${schoolName} 湖畔园`,
     baiduKeyword: `${schoolName} 湖畔园`,
   },

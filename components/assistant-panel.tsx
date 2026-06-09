@@ -13,11 +13,11 @@ type Message = {
 };
 
 const prompts = [
-  "文汇楼（图书馆）在哪",
-  "西门在哪",
-  "体育馆在哪",
-  "双镜湖在哪",
-  "学生证丢了怎么办",
+  "大一成长规划怎么做",
+  "适合我的竞赛有哪些",
+  "证书怎么规划",
+  "最近有哪些成长机会",
+  "学习资源怎么找",
   "我是计算机应用技术专业大一",
 ];
 
@@ -32,7 +32,7 @@ export function AssistantPanel() {
     {
       id: "welcome",
       role: "assistant",
-      content: "你好，我是扬工智行。你可以咨询校园导航、学习成长、学生事务、安全教育和心理关怀。",
+      content: "你好，我是扬工智行 AI成长导师。你可以咨询成长规划、竞赛推荐、证书推荐、成长机会、学习资源和心理关怀。",
     },
   ]);
   const [input, setInput] = useState("");
@@ -88,8 +88,8 @@ export function AssistantPanel() {
             <Bot className="size-5" />
           </span>
           <div>
-            <h2 className="font-black text-slate-950">AI校园助手</h2>
-            <p className="text-xs text-slate-500">Dify Chatflow · 连续对话</p>
+            <h2 className="font-black text-slate-950">AI成长导师</h2>
+            <p className="text-xs text-slate-500">成长规划 · 机会推荐 · 关怀支持</p>
           </div>
         </div>
       </div>

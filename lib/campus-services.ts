@@ -35,11 +35,11 @@ export const campusServices = [
   },
   {
     id: "campus_opportunities",
-    title: "校园机会",
+    title: "成长机会",
     shortTitle: "机会",
-    description: "招聘、社团、志愿、比赛、讲座和勤工助学通知解读。",
-    capability: "机会中心",
-    prompt: "最近适合大一学生参加的校园机会有哪些？",
+    description: "班助、学生组织、社团、志愿、竞赛、创新创业和实习实践机会解读。",
+    capability: "成长机会",
+    prompt: "最近适合大一学生参加的成长机会有哪些？",
     emoji: "📢",
     icon: Megaphone,
     accent: "from-teal-500 to-emerald-400",
@@ -47,7 +47,7 @@ export const campusServices = [
   },
   {
     id: "growth_plan",
-    title: "学习成长",
+    title: "成长规划",
     shortTitle: "成长",
     description: "学习规划、竞赛建议和成长路线。",
     capability: "成长规划",
@@ -107,8 +107,8 @@ export const serviceHighlights = [
     icon: MapPin,
   },
   {
-    label: "公益定位",
-    value: "聚焦校园公共服务与学生支持。",
+    label: "成长陪伴",
+    value: "聚焦机会发现、成长规划、学习资源与关怀支持。",
     icon: ShieldCheck,
   },
 ];

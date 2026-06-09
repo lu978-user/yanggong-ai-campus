@@ -39,13 +39,14 @@ type FavoriteOpportunity = {
 
 const categoryFilters = [
   "全部",
-  "校园岗位",
+  "班主任助理",
   "学生组织",
   "社团活动",
   "志愿服务",
+  "校园活动",
   "技能竞赛",
   "创新创业",
-  "就业实习",
+  "实习实践",
   "讲座培训",
   "奖学金评优",
 ];
@@ -59,15 +60,15 @@ const stats = [
 
 const hotOpportunities = [
   {
-    title: "班主任助理招募",
-    type: "校园岗位",
+    title: "班主任助理",
+    type: "班主任助理",
     deadline: "6月25日",
     score: 5,
     audience: ["大二", "大三", "学生干部", "责任心强"],
     summary: "适合希望积累学生工作经历、提升组织协调能力的同学。",
   },
   {
-    title: "学生会招新",
+    title: "学生组织",
     type: "学生组织",
     deadline: "6月22日",
     score: 4,
@@ -91,7 +92,15 @@ const hotOpportunities = [
     summary: "适合希望积累公益服务经历、提升社会责任感的同学。",
   },
   {
-    title: "蓝桥杯竞赛",
+    title: "校园活动",
+    type: "校园活动",
+    deadline: "6月28日",
+    score: 4,
+    audience: ["活动执行", "校园融入", "综合素质"],
+    summary: "适合希望拓展校园参与、提升表达与组织能力的同学。",
+  },
+  {
+    title: "技能竞赛",
     type: "技能竞赛",
     deadline: "7月5日",
     score: 5,
@@ -105,6 +114,14 @@ const hotOpportunities = [
     score: 4,
     audience: ["项目实践", "团队协作", "创新实践"],
     summary: "适合有项目想法、希望参加创新创业训练和赛事的同学。",
+  },
+  {
+    title: "实习实践",
+    type: "实习实践",
+    deadline: "7月18日",
+    score: 5,
+    audience: ["就业导向", "岗位体验", "职业能力"],
+    summary: "适合希望提前了解岗位要求、积累实践经历和就业素材的同学。",
   },
 ];
 
@@ -277,7 +294,7 @@ export default function OpportunitiesPage() {
 
   async function interpretWithAi(item: OpportunityNotice) {
     await askDify(
-      `请解读以下校园机会通知：
+      `请解读以下成长机会通知：
 标题：${item.title}
 内容：${item.summary}
 链接：${item.url}`,
@@ -290,7 +307,7 @@ export default function OpportunitiesPage() {
     if (!content) return;
 
     await askDify(
-      `请解读以下校园机会通知：
+      `请解读以下成长机会通知：
 内容：
 ${content}`,
       {
@@ -337,7 +354,7 @@ ${content}`,
 
   async function interpretWechatWithAi(article: WechatArticle) {
     await askDify(
-      `请解读以下校园机会通知：
+      `请解读以下成长机会通知：
 
 来源：微信公众号
 标题：${article.title}
@@ -378,11 +395,11 @@ ${article.content}
               Campus Opportunity Intelligence
             </p>
             <h1 className="mt-4 text-4xl font-black tracking-normal text-slate-950 sm:text-6xl">
-              校园机会中心
+              成长机会中心
             </h1>
-            <p className="mt-2 text-2xl font-black text-blue-700">发现机会 · 解读机会 · 把握机会</p>
+            <p className="mt-2 text-2xl font-black text-blue-700">发现机会 · 参与实践 · 沉淀成长</p>
             <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-600">
-              聚合校园通知、班主任助理招募、社团活动、竞赛报名、志愿服务、就业实习等成长机会，通过 AI 自动分析参与价值与行动建议。
+              聚合班主任助理、学生组织、社团招新、志愿服务、校园活动、技能竞赛、创新创业、实习实践等成长机会，通过 AI 自动分析参与价值与行动建议。
             </p>
           </div>
         </section>
@@ -425,7 +442,7 @@ ${article.content}
         </section>
 
         <section className="mt-5">
-          <SectionHeader eyebrow="Hot Opportunities" title="热门机会" desc="优先展示适合学生成长、实践和履历积累的校园机会。" />
+          <SectionHeader eyebrow="Hot Opportunities" title="热门成长机会" desc="优先展示适合学生成长、实践、履历积累和能力提升的机会。" />
           <div className="mt-4 grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
             {filteredHot.map((item, index) => (
               <motion.article
@@ -489,7 +506,7 @@ ${article.content}
 
         <section className="premium-card mt-5 p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <SectionHeader eyebrow="Official Notices" title="最新校园机会" desc="自动筛选学校官网公开通知中的招聘、招募、报名、志愿、竞赛、讲座和实践机会。" />
+            <SectionHeader eyebrow="Official Notices" title="最新成长机会" desc="自动筛选学校官网公开通知中的班助、组织招募、社团、志愿、竞赛、讲座和实习实践机会。" />
             {latestLoading && (
               <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-700">
                 <Loader2 className="size-4 animate-spin" />
@@ -499,7 +516,7 @@ ${article.content}
           </div>
 
           {latestError && <StatusMessage tone="orange" text={latestError} />}
-          {!latestError && !latestLoading && latest.length === 0 && <StatusMessage tone="blue" text="暂无匹配的校园机会通知。" />}
+          {!latestError && !latestLoading && latest.length === 0 && <StatusMessage tone="blue" text="暂无匹配的成长机会通知。" />}
 
           {latest.length > 0 && (
             <div className="mt-5 grid gap-3 lg:grid-cols-2">
@@ -520,7 +537,7 @@ ${article.content}
           <SectionHeader
             eyebrow="AI Notice Interpreter"
             title="AI通知解读助手"
-            desc="支持解析学校官网通知、公众号通知、班级群通知、活动报名通知等内容。"
+            desc="支持解析学校官网通知、公众号通知、班级群通知、活动报名通知等内容，帮助判断是否值得参与以及下一步怎么做。"
           />
           <textarea
             value={notice}
@@ -535,7 +552,7 @@ ${article.content}
             className="mt-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-3 text-sm font-black text-white shadow-glow disabled:cursor-not-allowed disabled:opacity-70 active:scale-95"
           >
             {aiLoadingUrl === "manual" ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
-            {aiLoadingUrl === "manual" ? "正在分析校园机会..." : "开始AI解读"}
+            {aiLoadingUrl === "manual" ? "正在分析成长机会..." : "开始AI解读"}
           </button>
         </section>
 
@@ -672,7 +689,7 @@ function OpportunityReport({
     >
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-3xl font-black text-slate-950">📢 校园机会分析报告</h2>
+          <h2 className="text-3xl font-black text-slate-950">📢 成长机会分析报告</h2>
           <p className="mt-2 text-sm font-bold text-slate-500">由扬工智行 AI 自动生成</p>
         </div>
         <p className="rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-700">
