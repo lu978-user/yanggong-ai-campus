@@ -343,6 +343,32 @@ ${article.content}
           </div>
         </section>
 
+        <section className="mt-5 overflow-hidden rounded-[32px] border border-white/70 bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-500 p-6 text-white shadow-glow transition-all duration-300 hover:-translate-y-1 dark:border-slate-700/60">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.24em] text-white/70">Opportunity Radar</p>
+              <h2 className="mt-3 text-3xl font-black tracking-normal sm:text-4xl">今天你错过机会了吗？</h2>
+              <p className="mt-3 max-w-4xl text-sm leading-7 text-white/84">
+                过去7天内，校园中可能出现了班助招募、竞赛报名、志愿服务、社团活动、讲座培训等机会。扬工智行帮助你及时发现并理解它们。
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-3">
+              <a
+                href="#hot-opportunities"
+                className="rounded-full bg-white px-5 py-3 text-sm font-black text-blue-700 shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+              >
+                立即查看机会
+              </a>
+              <a
+                href="#ai-interpret"
+                className="rounded-full border border-white/60 bg-white/16 px-5 py-3 text-sm font-black text-white backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/24 active:scale-95"
+              >
+                AI解读通知
+              </a>
+            </div>
+          </div>
+        </section>
+
         <section className="mt-5 grid gap-3 md:grid-cols-4">
           {stats.map(([label, value], index) => (
             <motion.div
@@ -380,7 +406,7 @@ ${article.content}
           </div>
         </section>
 
-        <section className="mt-5">
+        <section id="hot-opportunities" className="mt-5 scroll-mt-24">
           <SectionHeader eyebrow="Hot Opportunities" title="热门成长机会" desc="优先展示适合学生成长、实践、履历积累和能力提升的机会。" />
           <div className="mt-4 grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
             {filteredHot.map((item, index) => (
@@ -451,7 +477,7 @@ ${article.content}
           </div>
         </section>
 
-        <section className="premium-card mt-5 p-6">
+        <section id="ai-interpret" className="premium-card mt-5 scroll-mt-24 p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <SectionHeader eyebrow="Official Notices" title="最新成长机会" desc="自动筛选学校官网公开通知中的班助、组织招募、社团、志愿、竞赛、讲座和实习实践机会。" />
             {latestLoading && (

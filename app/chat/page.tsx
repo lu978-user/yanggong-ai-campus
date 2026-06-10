@@ -5,16 +5,13 @@ import { Bot, Loader2, Mic, RotateCcw, Send, Sparkles, UserRound } from "lucide-
 import { motion } from "framer-motion";
 import { AppShell } from "@/components/app-shell";
 import { MarkdownResponse } from "@/components/markdown-response";
-import { sanitizeResponse } from "@/lib/response-sanitizer";
+import { useDifyChat } from "@/hooks/use-dify-chat";
 import { cn } from "@/lib/utils";
 
-type Message = {
-  id: string;
-  role: "assistant" | "user";
-  content: string;
-};
-
 const FAILURE_MESSAGE = "暂时无法连接智能体，请稍后再试。";
+const INITIAL_MESSAGE =
+  "你好，我是扬工智行AI成长导师。你可以咨询成长规划、竞赛推荐、证书推荐、成长机会、学习资源和心理关怀，我会结合校园知识库持续陪伴你规划下一步。";
+const RESET_MESSAGE = "会话已清空。你可以重新开始咨询校园导航、成长规划或学生事务。";
 
 const promptGroups = [
   {
@@ -31,60 +28,20 @@ const promptGroups = [
   },
 ];
 
-function createId() {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
-
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content:
-        "你好，我是扬工智行 AI成长导师。你可以咨询成长规划、竞赛推荐、证书推荐、成长机会、学习资源和心理关怀，我会结合校园知识库持续陪伴你规划下一步。",
-    },
-  ]);
   const [input, setInput] = useState("");
-  const [conversationId, setConversationId] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { messages, loading, sendMessage: sendDifyMessage, clearMessages } = useDifyChat({
+    initialMessage: INITIAL_MESSAGE,
+    failureMessage: FAILURE_MESSAGE,
+    fallbackAnswer: "已收到请求，但暂时没有可展示的回答。",
+  });
 
   async function sendMessage(text: string) {
     const query = text.trim();
     if (!query || loading) return;
 
-    setMessages((current) => [...current, { id: createId(), role: "user", content: query }]);
     setInput("");
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/dify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: query, conversationId }),
-      });
-      const data = (await response.json()) as {
-        answer: string;
-        conversationId: string;
-      };
-      if (!response.ok) throw new Error(data.answer || FAILURE_MESSAGE);
-
-      setConversationId(data.conversationId ?? "");
-      setMessages((current) => [
-        ...current,
-        {
-          id: createId(),
-          role: "assistant",
-          content: sanitizeResponse(data.answer || "已收到请求，但暂时没有可展示的回答。"),
-        },
-      ]);
-    } catch {
-      setMessages((current) => [
-        ...current,
-        { id: createId(), role: "assistant", content: FAILURE_MESSAGE },
-      ]);
-    } finally {
-      setLoading(false);
-    }
+    await sendDifyMessage(query);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -93,14 +50,7 @@ export default function ChatPage() {
   }
 
   function resetChat() {
-    setConversationId("");
-    setMessages([
-      {
-        id: "welcome",
-        role: "assistant",
-        content: "会话已清空。你可以重新开始咨询校园导航、成长规划或学生事务。",
-      },
-    ]);
+    clearMessages(RESET_MESSAGE);
   }
 
   return (
@@ -143,7 +93,7 @@ export default function ChatPage() {
         <section className="flex min-h-[760px] flex-col overflow-hidden rounded-[32px] border border-white/70 bg-white/80 shadow-xl backdrop-blur-2xl">
           <div className="flex items-center justify-between gap-4 border-b border-blue-100/80 px-5 py-4">
             <div>
-              <p className="text-xs font-black text-blue-600">YangGong AI Campus</p>
+              <p className="text-xs font-black text-blue-600">YPI · AI-Powered Student Growth Platform</p>
               <h2 className="text-xl font-black text-slate-950">成长陪伴对话区</h2>
             </div>
             <button

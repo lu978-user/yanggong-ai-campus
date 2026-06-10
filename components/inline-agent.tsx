@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { Bot, Loader2, Send } from "lucide-react";
 import { MarkdownResponse } from "@/components/markdown-response";
-import { sanitizeResponse } from "@/lib/response-sanitizer";
+import { useDifyChat } from "@/hooks/use-dify-chat";
 
 const FAILURE_MESSAGE = "暂时无法连接智能体，请稍后再试。";
 
@@ -19,34 +19,18 @@ export function InlineAgent({
   suggested?: string[];
 }) {
   const [input, setInput] = useState("");
-  const [answer, setAnswer] = useState("");
-  const [conversationId, setConversationId] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { messages, loading, sendMessage: sendDifyMessage } = useDifyChat({
+    failureMessage: FAILURE_MESSAGE,
+    fallbackAnswer: "已收到请求。",
+  });
+  const answer = [...messages].reverse().find((message) => message.role === "assistant")?.content ?? "";
 
   async function ask(text: string) {
     const message = text.trim();
     if (!message || loading) return;
 
     setInput("");
-    setLoading(true);
-    setAnswer("");
-
-    try {
-      const response = await fetch("/api/dify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, conversationId }),
-      });
-      const data = (await response.json()) as { answer: string; conversationId: string };
-      if (!response.ok) throw new Error(data.answer || FAILURE_MESSAGE);
-
-      setConversationId(data.conversationId ?? "");
-      setAnswer(sanitizeResponse(data.answer || "已收到请求。"));
-    } catch {
-      setAnswer(FAILURE_MESSAGE);
-    } finally {
-      setLoading(false);
-    }
+    await sendDifyMessage(message);
   }
 
   function submit(event: FormEvent<HTMLFormElement>) {

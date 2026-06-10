@@ -3,14 +3,8 @@
 import { FormEvent, useRef, useState } from "react";
 import { Bot, Loader2, Send, UserRound } from "lucide-react";
 import { MarkdownResponse } from "@/components/markdown-response";
-import { sanitizeResponse } from "@/lib/response-sanitizer";
+import { useDifyChat } from "@/hooks/use-dify-chat";
 import { cn } from "@/lib/utils";
-
-type Message = {
-  id: string;
-  role: "assistant" | "user";
-  content: string;
-};
 
 const prompts = [
   "大一成长规划怎么做",
@@ -22,57 +16,27 @@ const prompts = [
 ];
 
 const FAILURE_MESSAGE = "暂时无法连接智能体，请稍后再试。";
-
-function createId() {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
+const INITIAL_MESSAGE =
+  "你好，我是扬工智行AI成长导师。你可以咨询成长规划、竞赛推荐、证书推荐、成长机会、学习资源和心理关怀。";
 
 export function AssistantPanel() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content: "你好，我是扬工智行 AI成长导师。你可以咨询成长规划、竞赛推荐、证书推荐、成长机会、学习资源和心理关怀。",
-    },
-  ]);
   const [input, setInput] = useState("");
-  const [conversationId, setConversationId] = useState("");
-  const [loading, setLoading] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+  const { messages, loading, sendMessage: sendDifyMessage } = useDifyChat({
+    initialMessage: INITIAL_MESSAGE,
+    failureMessage: FAILURE_MESSAGE,
+    fallbackAnswer: "已收到请求。",
+  });
 
   async function sendMessage(text: string) {
     const query = text.trim();
     if (!query || loading) return;
 
-    setMessages((current) => [...current, { id: createId(), role: "user", content: query }]);
     setInput("");
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/dify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: query, conversationId }),
-      });
-      const data = (await response.json()) as { answer: string; conversationId: string };
-      if (!response.ok) throw new Error(data.answer || FAILURE_MESSAGE);
-
-      setConversationId(data.conversationId ?? "");
-      setMessages((current) => [
-        ...current,
-        { id: createId(), role: "assistant", content: sanitizeResponse(data.answer || "已收到请求。") },
-      ]);
-    } catch {
-      setMessages((current) => [
-        ...current,
-        { id: createId(), role: "assistant", content: FAILURE_MESSAGE },
-      ]);
-    } finally {
-      setLoading(false);
-      setTimeout(() => {
-        listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-      }, 0);
-    }
+    await sendDifyMessage(query);
+    setTimeout(() => {
+      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+    }, 0);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {

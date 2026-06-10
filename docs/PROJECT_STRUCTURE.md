@@ -19,8 +19,6 @@ yanggong-zhixing/
 │  │  ├─ button.tsx
 │  │  └─ card.tsx
 │  ├─ app-shell.tsx            # 全局导航、主题切换、页面背景
-│  ├─ chat-workspace.tsx       # 三栏聊天工作台、历史、清空、流式输出
-│  └─ theme-toggle.tsx         # 深浅色模式切换
 ├─ lib/
 │  ├─ campus-services.ts       # 六大校园服务配置与预设问题
 │  └─ utils.ts                 # cn className 合并工具

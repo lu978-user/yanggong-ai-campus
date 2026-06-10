@@ -53,6 +53,12 @@ body {
     "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
 }
 
+@media (pointer: fine) and (min-width: 768px) {
+  body {
+    cursor: none;
+  }
+}
+
 .dark body {
   background:
     radial-gradient(circle at 8% 8%, rgba(37, 99, 235, 0.2), transparent 28%),
@@ -140,6 +146,22 @@ a:active,
     inset 0 1px 0 rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(22px);
   border-radius: 24px;
+  transition:
+    transform 300ms ease,
+    box-shadow 300ms ease,
+    border-color 300ms ease,
+    background-color 300ms ease,
+    color 300ms ease;
+  will-change: transform;
+}
+
+.premium-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: rgba(56, 189, 248, 0.52);
+  box-shadow:
+    0 30px 90px rgba(37, 99, 235, 0.16),
+    0 0 0 1px rgba(56, 189, 248, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .dark .premium-card {
@@ -147,6 +169,14 @@ a:active,
   background: linear-gradient(145deg, rgba(15, 23, 42, 0.82), rgba(30, 41, 59, 0.62));
   box-shadow:
     0 24px 80px rgba(0, 0, 0, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.dark .premium-card:hover {
+  border-color: rgba(34, 211, 238, 0.32);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.44),
+    0 0 0 1px rgba(34, 211, 238, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
@@ -340,6 +370,75 @@ a:active,
 
 .typing-dot:nth-child(3) {
   animation-delay: 0.32s;
+}
+
+.ripple-surface {
+  position: relative;
+  overflow: hidden;
+}
+
+.interaction-ripple {
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.45);
+  transform: scale(0);
+  animation: interaction-ripple 650ms ease-out forwards;
+}
+
+.loading-progress {
+  width: 0;
+  background-size: 200% 100%;
+  animation:
+    loading-progress 1000ms cubic-bezier(0.4, 0, 0.2, 1) forwards,
+    loading-shimmer 1200ms linear infinite;
+}
+
+.reveal-ready {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 600ms ease,
+    transform 600ms ease,
+    box-shadow 300ms ease,
+    border-color 300ms ease;
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+@keyframes interaction-ripple {
+  to {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+@keyframes loading-progress {
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes loading-shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
 }
 
 .no-scrollbar {

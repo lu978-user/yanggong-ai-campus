@@ -68,54 +68,6 @@ const categoryLabels: Record<DisplayCategory, string> = {
   activity: "校园服务",
 };
 
-const categoryStyles: Record<DisplayCategory, { pin: string; active: string; badge: string }> = {
-  teaching: {
-    pin: "from-blue-500 to-sky-400",
-    active: "ring-blue-300/55",
-    badge: "bg-blue-50 text-blue-700",
-  },
-  library: {
-    pin: "from-sky-500 to-blue-500",
-    active: "ring-sky-300/55",
-    badge: "bg-sky-50 text-sky-700",
-  },
-  training: {
-    pin: "from-indigo-500 to-violet-400",
-    active: "ring-indigo-300/55",
-    badge: "bg-indigo-50 text-indigo-700",
-  },
-  canteen: {
-    pin: "from-emerald-500 to-teal-400",
-    active: "ring-emerald-300/55",
-    badge: "bg-emerald-50 text-emerald-700",
-  },
-  dorm: {
-    pin: "from-lime-500 to-emerald-400",
-    active: "ring-lime-300/55",
-    badge: "bg-lime-50 text-lime-700",
-  },
-  sport: {
-    pin: "from-orange-500 to-amber-400",
-    active: "ring-orange-300/55",
-    badge: "bg-orange-50 text-orange-700",
-  },
-  landscape: {
-    pin: "from-violet-500 to-fuchsia-400",
-    active: "ring-violet-300/55",
-    badge: "bg-violet-50 text-violet-700",
-  },
-  gate: {
-    pin: "from-cyan-600 to-blue-500",
-    active: "ring-cyan-300/55",
-    badge: "bg-cyan-50 text-cyan-700",
-  },
-  activity: {
-    pin: "from-pink-500 to-violet-500",
-    active: "ring-pink-300/55",
-    badge: "bg-pink-50 text-pink-700",
-  },
-};
-
 function buildHotspotMeta(hotspot: MapHotspot): HotspotMeta {
   const route = ["北门", "校园主干道", hotspot.name];
   const categoryText = {

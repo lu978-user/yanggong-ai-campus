@@ -7,6 +7,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { RevealAuto } from "@/components/reveal";
+import { SiteFooter } from "@/components/site-footer";
 import { cn } from "@/lib/utils";
 
 const navGroups = [
@@ -93,6 +95,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-page text-foreground transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+      <RevealAuto />
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[240px] overflow-y-auto border-r border-white/70 bg-white/72 px-4 py-5 shadow-card-light backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-950/90 lg:block">
         <SidebarContent
           isActive={isActive}
@@ -168,6 +171,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {children}
           </motion.div>
         </AnimatePresence>
+        <SiteFooter />
       </div>
 
       <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-blue-100/80 bg-white/92 px-2 py-2 backdrop-blur-xl transition-colors duration-300 dark:border-slate-700/70 dark:bg-slate-950/92 lg:hidden">
@@ -286,7 +290,9 @@ function SidebarContent({
       </nav>
 
       <div className="mt-auto min-h-fit rounded-2xl border border-blue-100 bg-blue-50/80 p-4 pb-4 transition-colors duration-300 dark:border-slate-700/70 dark:bg-slate-900/80">
-        <p className="whitespace-normal break-words text-sm font-black text-blue-800 dark:text-blue-300">YangGong AI Campus</p>
+        <p className="whitespace-normal break-words text-2xl font-black tracking-tight text-blue-800 dark:text-blue-300">YPI</p>
+        <p className="mt-1 whitespace-normal break-words text-sm font-black text-slate-900 dark:text-slate-100">扬工智行</p>
+        <p className="mt-1 whitespace-normal break-words text-[10px] font-bold uppercase tracking-[0.14em] text-blue-600 dark:text-blue-300">AI-Powered Student Growth Platform</p>
         <p className="mt-2 whitespace-normal break-words text-xs leading-6 text-slate-600 dark:text-slate-300">
           大学生成长机会与关怀服务平台，陪伴学生发现机会、规划成长、获取支持。
         </p>

@@ -29,7 +29,8 @@ export default function AboutPage() {
         <section className="premium-card overflow-hidden p-8">
           <p className="text-sm font-black text-blue-600">Competition Showcase</p>
           <h1 className="mt-2 text-5xl font-black tracking-normal text-slate-950">扬工智行</h1>
-          <p className="mt-2 text-xl font-black text-blue-700">YangGong AI Campus</p>
+          <p className="mt-2 text-3xl font-black tracking-tight text-blue-700">YPI</p>
+          <p className="mt-1 text-sm font-black uppercase tracking-[0.18em] text-slate-500">AI-Powered Student Growth Platform</p>
           <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-600">
             扬工智行是一套面向扬州工业职业技术学院学生的大学生成长机会与关怀服务平台，围绕成长规划、机会发现、学习资源、成长关怀和校园基础服务构建智慧校园体验。
           </p>

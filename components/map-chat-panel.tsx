@@ -5,21 +5,8 @@ import { Bot, Loader2, Send, Sparkles, UserRound } from "lucide-react";
 import { motion } from "framer-motion";
 import { type MapHotspotId } from "@/data/map-hotspots";
 import { MarkdownResponse } from "@/components/markdown-response";
-import { sanitizeResponse } from "@/lib/response-sanitizer";
+import { useDifyChat } from "@/hooks/use-dify-chat";
 import { cn } from "@/lib/utils";
-
-type Message = {
-  id: string;
-  role: "assistant" | "user";
-  content: string;
-};
-
-type DifyResponse = {
-  answer: string;
-  conversationId: string;
-  mapId: MapHotspotId | null;
-  raw: unknown;
-};
 
 type MapChatPanelProps = {
   onMapId: (id: MapHotspotId) => void;
@@ -32,77 +19,35 @@ const recommendedPrompts = [
   "📍 双镜湖在哪",
   "📍 文筑楼在哪",
 ];
-const FAILURE_MESSAGE = "暂时无法连接智能体，请稍后再试。";
 
-function createId() {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
+const FAILURE_MESSAGE = "暂时无法连接智能体，请稍后再试。";
+const INITIAL_MESSAGE =
+  "你好，我是扬工智行地图导览助手。你可以询问校园地点，我会调用Dify智能体并根据返回的地图ID自动高亮地图热点。";
 
 function cleanPrompt(prompt: string) {
   return prompt.replace(/^📍\s*/, "");
 }
 
 export function MapChatPanel({ onMapId }: MapChatPanelProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content:
-        "你好，我是扬工智行地图导览助手。你可以询问校园地点，我会调用Dify智能体并根据返回的地图ID自动高亮地图热点。",
-    },
-  ]);
   const [input, setInput] = useState("");
-  const [conversationId, setConversationId] = useState("");
-  const [loading, setLoading] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+  const { messages, loading, sendMessage: sendDifyMessage } = useDifyChat({
+    initialMessage: INITIAL_MESSAGE,
+    failureMessage: FAILURE_MESSAGE,
+    fallbackAnswer: "已收到请求，但暂时没有可展示的回答。",
+    normalizeMessage: cleanPrompt,
+    onMapId,
+  });
 
   async function sendMessage(text: string) {
     const query = cleanPrompt(text).trim();
     if (!query || loading) return;
 
-    setMessages((current) => [...current, { id: createId(), role: "user", content: query }]);
     setInput("");
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/dify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: query,
-          conversationId,
-        }),
-      });
-
-      const data = (await response.json()) as DifyResponse;
-      if (!response.ok) throw new Error(data.answer || FAILURE_MESSAGE);
-
-      setConversationId(data.conversationId ?? "");
-      if (data.mapId) onMapId(data.mapId);
-
-      setMessages((current) => [
-        ...current,
-        {
-          id: createId(),
-          role: "assistant",
-          content: sanitizeResponse(data.answer || "已收到请求，但暂时没有可展示的回答。"),
-        },
-      ]);
-    } catch {
-      setMessages((current) => [
-        ...current,
-        {
-          id: createId(),
-          role: "assistant",
-          content: FAILURE_MESSAGE,
-        },
-      ]);
-    } finally {
-      setLoading(false);
-      setTimeout(() => {
-        listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-      }, 0);
-    }
+    await sendDifyMessage(query);
+    setTimeout(() => {
+      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+    }, 0);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
