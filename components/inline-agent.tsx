@@ -83,7 +83,7 @@ export function InlineAgent({
 
       {(answer || loading) && (
         <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50/70 p-4 text-sm leading-7 text-slate-700">
-          {loading ? "正在请求智能体..." : <MarkdownResponse text={answer} />}
+          {loading ? "AI 正在思考..." : <MarkdownResponse text={answer} />}
         </div>
       )}
     </section>

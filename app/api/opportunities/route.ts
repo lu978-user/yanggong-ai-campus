@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const ALLOWED_HOSTS = new Set(["ypi.edu.cn", "www.ypi.edu.cn"]);
+
 type OpportunityNotice = {
   title: string;
   date: string;
@@ -33,9 +36,21 @@ const DEFAULT_SOURCE_URLS = [
   "https://www.ypi.edu.cn/tzgg.htm",
 ];
 
+let cachedNotices: { expiresAt: number; data: OpportunityNotice[] } | null = null;
+
+function isAllowedSourceUrl(value: string) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && ALLOWED_HOSTS.has(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
 function getSourceUrls() {
   const configured = process.env.OPPORTUNITIES_SOURCE_URL?.trim();
-  return configured ? [configured] : DEFAULT_SOURCE_URLS;
+  const urls = configured ? [configured] : DEFAULT_SOURCE_URLS;
+  return urls.filter(isAllowedSourceUrl);
 }
 
 function stripHtml(value: string) {
@@ -143,6 +158,8 @@ function parseOpportunities(html: string, sourceUrl: string): OpportunityNotice[
     const contextEnd = Math.min(html.length, anchorPattern.lastIndex + 240);
     const context = html.slice(contextStart, contextEnd);
     const url = absolutizeUrl(href, sourceUrl);
+    if (!isAllowedSourceUrl(url)) continue;
+
     const key = `${title}-${url}`;
     if (seen.has(key)) continue;
     seen.add(key);
@@ -160,11 +177,15 @@ function parseOpportunities(html: string, sourceUrl: string): OpportunityNotice[
 }
 
 async function fetchSource(sourceUrl: string) {
+  if (!isAllowedSourceUrl(sourceUrl)) {
+    throw new Error("Source URL is not allowed");
+  }
+
   const response = await fetch(sourceUrl, {
     headers: {
       "User-Agent": "YangGong-AI-Campus/1.0 public-notice-fetcher",
     },
-    cache: "no-store",
+    next: { revalidate: 300 },
   });
 
   if (!response.ok) {
@@ -176,11 +197,19 @@ async function fetchSource(sourceUrl: string) {
 }
 
 export async function GET() {
+  if (cachedNotices && cachedNotices.expiresAt > Date.now()) {
+    return NextResponse.json(cachedNotices.data satisfies OpportunityNotice[]);
+  }
+
   for (const sourceUrl of getSourceUrls()) {
     try {
       const html = await fetchSource(sourceUrl);
       const notices = parseOpportunities(html, sourceUrl);
       if (notices.length > 0) {
+        cachedNotices = {
+          expiresAt: Date.now() + CACHE_TTL_MS,
+          data: notices,
+        };
         return NextResponse.json(notices satisfies OpportunityNotice[]);
       }
     } catch {

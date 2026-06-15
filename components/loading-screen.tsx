@@ -19,7 +19,7 @@ export function LoadingScreen() {
     >
       <div className="flex flex-col items-center">
         <div className="animate-float-soft relative grid size-20 place-items-center overflow-hidden rounded-[28px] border border-white/80 bg-white/85 shadow-2xl backdrop-blur-2xl dark:border-slate-700 dark:bg-slate-900/85">
-          <Image src="/logo.png" alt="扬工智行" fill priority className="object-contain p-3" />
+          <Image src="/logo-small.png" alt="扬工智行" fill priority sizes="80px" className="object-contain p-3" />
         </div>
         <p className="mt-5 text-2xl font-black tracking-normal text-slate-950 dark:text-slate-100">
           扬工智行

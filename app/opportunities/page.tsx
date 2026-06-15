@@ -38,6 +38,14 @@ function nowText() {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
+function sanitizeForPrompt(text: string) {
+  return text
+    .replace(/[<>{}]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 2000);
+}
+
 export default function OpportunitiesPage() {
   const [notice, setNotice] = useState("");
   const [activeFilter, setActiveFilter] = useState("全部");
@@ -107,7 +115,7 @@ export default function OpportunitiesPage() {
       setLatestError("");
 
       try {
-        const response = await fetch("/api/opportunities", { cache: "no-store" });
+        const response = await fetch("/api/opportunities");
         if (!response.ok) throw new Error("failed");
         const data = (await response.json()) as OpportunityNotice[];
         if (!ignore) setLatest(data);
@@ -224,14 +232,18 @@ export default function OpportunitiesPage() {
   }
 
   async function interpretWechatWithAi(article: WechatArticle) {
+    const safeTitle = sanitizeForPrompt(article.title);
+    const safeUrl = sanitizeForPrompt(article.url);
+    const safeContent = sanitizeForPrompt(article.content);
+
     await askDify(
       `请解读以下成长机会通知：
 
 来源：微信公众号
-标题：${article.title}
-链接：${article.url}
+标题：${safeTitle}
+链接：${safeUrl}
 正文：
-${article.content}
+${safeContent}
 
 请按照以下格式输出：
 
@@ -246,11 +258,11 @@ ${article.content}
 ⚠️ 注意事项
 ➡️ 下一步建议`,
       {
-        title: article.title,
+        title: safeTitle,
         date: "",
         url: article.url,
-        type: getOpportunityType(`${article.title}${article.content}`),
-        summary: article.summary,
+        type: getOpportunityType(`${safeTitle}${safeContent}`),
+        summary: sanitizeForPrompt(article.summary).slice(0, 300),
       },
     );
   }

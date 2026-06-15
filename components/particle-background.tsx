@@ -41,9 +41,13 @@ export function ParticleBackground({ className = "" }: ParticleBackgroundProps) 
     let height = 0;
     let particles: Particle[] = [];
     const mouse = { x: -9999, y: -9999 };
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     function particleCount() {
-      return window.innerWidth < 768 ? 40 : 120;
+      if (reduceMotion) return 0;
+      if (window.innerWidth < 640) return 18;
+      if (window.innerWidth < 1024) return 36;
+      return 96;
     }
 
     function resize() {
@@ -69,6 +73,7 @@ export function ParticleBackground({ className = "" }: ParticleBackgroundProps) 
     }
 
     function draw() {
+      if (reduceMotion) return;
       drawingContext.clearRect(0, 0, width, height);
 
       for (const particle of particles) {
@@ -115,16 +120,20 @@ export function ParticleBackground({ className = "" }: ParticleBackgroundProps) 
     }
 
     resize();
-    draw();
+    if (!reduceMotion) draw();
     window.addEventListener("resize", resize);
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseleave", handleMouseLeave);
+    if (!reduceMotion) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseleave", handleMouseLeave);
+    }
 
     return () => {
       window.cancelAnimationFrame(frameId);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseleave", handleMouseLeave);
+      if (!reduceMotion) {
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseleave", handleMouseLeave);
+      }
     };
   }, []);
 

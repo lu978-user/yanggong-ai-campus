@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
   BookOpen,
@@ -130,9 +130,33 @@ const growthLoop = [
   { title: "就业升学", desc: "形成简历经历与升学竞争力", icon: Route },
 ];
 
-const radarProfile = {
-  majors: ["计算机应用技术", "软件技术", "人工智能技术应用", "大数据技术", "全部专业"],
-  goals: ["竞赛", "就业", "专转本", "综合素质", "学生干部", "学习资源", "职业发展"],
+const USER_PROFILE_STORAGE_KEY = "yanggong_user_profile";
+
+type UserProfile = {
+  major: string;
+  grade: string;
+  goal: string;
+};
+
+const defaultUserProfile: UserProfile = {
+  major: "计算机应用技术",
+  grade: "大一",
+  goal: "竞赛",
+};
+
+const profileOptions = {
+  majors: [
+    "计算机应用技术",
+    "软件技术",
+    "大数据技术",
+    "人工智能技术应用",
+    "电子商务",
+    "机电一体化",
+    "工程造价",
+    "数字媒体艺术设计",
+  ],
+  grades: ["大一", "大二", "大三", "大四"],
+  goals: ["竞赛", "就业", "专转本", "考证", "学生干部", "综合素质", "学习资源"],
 };
 
 function stars(score: number) {
@@ -175,43 +199,78 @@ function includesAny(source: string[], targets: string[]) {
   return source.some((item) => targets.some((target) => item.includes(target) || target.includes(item)));
 }
 
-function matchUserProfile(opportunity: Opportunity) {
+function getProfileGoalKeywords(goal: string) {
+  const goalMap: Record<string, string[]> = {
+    竞赛: ["竞赛", "技能竞赛", "创新创业", "项目实践"],
+    就业: ["就业", "实习", "职业发展", "学生工作"],
+    专转本: ["专转本", "升学", "学习资源"],
+    考证: ["证书", "考证", "英语A级", "学习资源"],
+    学生干部: ["学生干部", "学生工作", "综合素质"],
+    综合素质: ["综合素质", "校园融入", "公益服务", "评优评先"],
+    学习资源: ["学习资源", "专转本", "考证", "学习习惯"],
+  };
+  return [goal, ...(goalMap[goal] ?? [])];
+}
+
+function loadUserProfile(): UserProfile {
+  if (typeof window === "undefined") return defaultUserProfile;
+
+  try {
+    const saved = window.localStorage.getItem(USER_PROFILE_STORAGE_KEY);
+    if (!saved) return defaultUserProfile;
+    const parsed = JSON.parse(saved) as Partial<UserProfile>;
+    return {
+      major: parsed.major || defaultUserProfile.major,
+      grade: parsed.grade || defaultUserProfile.grade,
+      goal: parsed.goal || defaultUserProfile.goal,
+    };
+  } catch {
+    return defaultUserProfile;
+  }
+}
+
+function matchUserProfile(opportunity: Opportunity, profile: UserProfile) {
   let score = Math.min(25, opportunity.recommendLevel * 5);
+  const goalKeywords = getProfileGoalKeywords(profile.goal);
   const majorMatched =
-    opportunity.relatedMajors.includes("全部专业") || includesAny(opportunity.relatedMajors, radarProfile.majors);
+    opportunity.relatedMajors.includes("全部专业") ||
+    opportunity.relatedMajors.includes(profile.major) ||
+    opportunity.targetAudience.includes(profile.major);
   const goalMatched =
-    includesAny(opportunity.relatedGoals, radarProfile.goals) ||
-    includesAny(opportunity.tags, radarProfile.goals) ||
-    includesAny(opportunity.growthValues, radarProfile.goals);
+    includesAny(opportunity.relatedGoals, goalKeywords) ||
+    includesAny(opportunity.tags, goalKeywords) ||
+    includesAny(opportunity.growthValues, goalKeywords);
+  const gradeMatched = opportunity.targetAudience.includes(profile.grade);
   const urgent = isDeadlineSoon(opportunity.deadline);
 
   if (majorMatched || goalMatched) score += 30;
+  if (gradeMatched) score += 10;
   if (urgent) score += 20;
   if (opportunity.recommendLevel >= 4) score += 20;
 
   return Math.min(100, score);
 }
 
-function buildRadarReason(opportunity: Opportunity, score: number, urgent: boolean) {
+function buildRadarReason(opportunity: Opportunity, score: number, urgent: boolean, profile: UserProfile) {
   if (urgent) {
     return `该机会距离截止较近，匹配度 ${score}%，建议优先确认报名条件。`;
   }
   if (score >= 70) {
-    return `该机会与你的成长画像高度匹配，可沉淀${opportunity.growthValues.slice(0, 2).join("、") || "成长经历"}。`;
+    return `该机会与你的画像（${profile.major} / ${profile.grade} / ${profile.goal}）高度匹配，可沉淀${opportunity.growthValues.slice(0, 2).join("、") || "成长经历"}。`;
   }
   return `该机会推荐指数较高，可作为拓展校园经历与能力标签的候选项。`;
 }
 
-function getRadarNodes(opportunities: Opportunity[]) {
+function getRadarNodes(opportunities: Opportunity[], profile: UserProfile) {
   return opportunities
     .map((opportunity) => {
-      const score = matchUserProfile(opportunity);
+      const score = matchUserProfile(opportunity, profile);
       const isUrgent = isDeadlineSoon(opportunity.deadline);
       return {
         opportunity,
         score,
         isUrgent,
-        reason: buildRadarReason(opportunity, score, isUrgent),
+        reason: buildRadarReason(opportunity, score, isUrgent, profile),
       };
     })
     .filter(({ opportunity, isUrgent }) => opportunity.followStatus !== "已完成" && (opportunity.recommendLevel >= 3 || isUrgent))
@@ -436,11 +495,14 @@ export default function DashboardPage() {
 }
 
 function OpportunityRadar() {
+  const reduceMotion = useReducedMotion();
   const [opportunities, setOpportunities] = useState<Opportunity[]>(defaultOpportunities);
+  const [profile, setProfile] = useState<UserProfile>(defaultUserProfile);
 
   useEffect(() => {
     function refreshOpportunities() {
       setOpportunities(getOpportunities());
+      setProfile(loadUserProfile());
     }
 
     refreshOpportunities();
@@ -452,24 +514,33 @@ function OpportunityRadar() {
     };
   }, []);
 
-  const radarNodes = useMemo(() => getRadarNodes(opportunities), [opportunities]);
+  useEffect(() => {
+    window.localStorage.setItem(USER_PROFILE_STORAGE_KEY, JSON.stringify(profile));
+  }, [profile]);
+
+  const radarNodes = useMemo(() => getRadarNodes(opportunities, profile), [opportunities, profile]);
   const [activeId, setActiveId] = useState("");
   const activeNode = radarNodes.find((node) => node.opportunity.id === activeId) ?? radarNodes[0] ?? null;
   const stats = useMemo(
     () =>
       [
         ["今日发现机会", opportunities.filter((item) => isSameDay(item.createdAt)).length],
-        ["适合你的机会", opportunities.filter((item) => matchUserProfile(item) >= 70).length],
+        ["适合你的机会", opportunities.filter((item) => matchUserProfile(item, profile) >= 70).length],
         ["即将截止", opportunities.filter((item) => isDeadlineSoon(item.deadline)).length],
         ["已完成", opportunities.filter((item) => item.followStatus === "已完成").length],
       ] as const,
-    [opportunities],
+    [opportunities, profile],
   );
+
+  function updateProfile(key: keyof UserProfile, value: string) {
+    setProfile((current) => ({ ...current, [key]: value }));
+  }
 
   return (
     <motion.div
-      animate={{ y: [0, -12, 0] }}
-      transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut" }}
+      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+      animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: "easeOut", delay: 0.12 }}
       className="relative mx-auto w-full max-w-[600px] overflow-hidden rounded-[34px] border border-white/90 bg-gradient-to-br from-white via-blue-50 to-cyan-50 p-5 shadow-[0_34px_110px_rgba(37,99,235,0.22)]"
     >
       <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-cyan-300/35 blur-3xl" />
@@ -486,6 +557,27 @@ function OpportunityRadar() {
           </span>
         </div>
 
+        <div className="mt-4 grid gap-2 rounded-[24px] border border-blue-100 bg-white/78 p-3 shadow-sm backdrop-blur-xl sm:grid-cols-3">
+          {[
+            ["专业", "major", profileOptions.majors],
+            ["年级", "grade", profileOptions.grades],
+            ["目标", "goal", profileOptions.goals],
+          ].map(([label, key, options]) => (
+            <label key={String(key)} className="grid gap-1">
+              <span className="text-[11px] font-black text-blue-600">{String(label)}</span>
+              <select
+                value={profile[key as keyof UserProfile]}
+                onChange={(event) => updateProfile(key as keyof UserProfile, event.target.value)}
+                className="h-10 rounded-2xl border border-blue-100 bg-blue-50/70 px-3 text-xs font-black text-slate-700 outline-none transition focus:border-blue-400 focus:bg-white"
+              >
+                {(options as string[]).map((option) => (
+                  <option key={option}>{option}</option>
+                ))}
+              </select>
+            </label>
+          ))}
+        </div>
+
         <div className="md:hidden">
           <OpportunityPulseCard stats={stats} />
         </div>
@@ -496,8 +588,8 @@ function OpportunityRadar() {
             <div className="absolute inset-16 rounded-full border border-cyan-300/18" />
             <div className="absolute inset-[34%] rounded-full border border-cyan-300/18" />
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+              animate={reduceMotion ? { rotate: 0 } : { rotate: 360 }}
+              transition={{ repeat: reduceMotion ? 0 : Infinity, duration: 4, ease: "linear" }}
               className="absolute inset-6 rounded-full bg-[conic-gradient(from_0deg,rgba(45,212,191,0.42),rgba(59,130,246,0.18),rgba(255,255,255,0.02)_25%,transparent_38%,transparent)]"
             />
             <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-cyan-300/12" />
@@ -516,9 +608,16 @@ function OpportunityRadar() {
                   key={opportunity.id}
                   type="button"
                   onClick={() => setActiveId(opportunity.id)}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: opportunity.followStatus === "未关注" ? [1, 1.05, 1] : 1 }}
-                  transition={{ delay: index * 0.08, repeat: opportunity.followStatus === "未关注" ? Infinity : 0, duration: 1.8 }}
+                  initial={reduceMotion ? false : { opacity: 0, scale: 0.8 }}
+                  animate={{
+                    opacity: 1,
+                    scale: !reduceMotion && opportunity.followStatus === "未关注" ? [1, 1.05, 1] : 1,
+                  }}
+                  transition={{
+                    delay: reduceMotion ? 0 : index * 0.08,
+                    repeat: !reduceMotion && opportunity.followStatus === "未关注" ? Infinity : 0,
+                    duration: 1.8,
+                  }}
                   className={`absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border px-3 py-1.5 text-[11px] font-black shadow-lg backdrop-blur transition hover:scale-110 active:scale-95 ${statusClass}`}
                   style={{ left: `${x}%`, top: `${y}%` }}
                 >
@@ -528,11 +627,11 @@ function OpportunityRadar() {
               );
             })}
 
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((dot) => (
+            {[0, 1, 2, 3, 4, 5].map((dot) => (
               <motion.span
                 key={dot}
-                animate={{ opacity: [0.25, 0.85, 0.25], scale: [1, 1.28, 1] }}
-                transition={{ delay: dot * 0.18, repeat: Infinity, duration: 2.6 }}
+                animate={reduceMotion ? { opacity: 0.45, scale: 1 } : { opacity: [0.25, 0.85, 0.25], scale: [1, 1.28, 1] }}
+                transition={{ delay: dot * 0.18, repeat: reduceMotion ? 0 : Infinity, duration: 2.6 }}
                 className="absolute size-1.5 rounded-full bg-cyan-200 shadow-[0_0_14px_rgba(103,232,249,0.78)]"
                 style={{
                   left: `${18 + ((dot * 17) % 64)}%`,
@@ -572,6 +671,9 @@ function OpportunityRadar() {
                   <p className="mt-2 rounded-2xl bg-blue-50 px-3 py-2 text-xs font-bold leading-5 text-blue-700">
                     推荐理由：{activeNode.reason}
                   </p>
+                  <p className="mt-2 rounded-2xl bg-white px-3 py-2 text-xs font-black text-slate-500">
+                    当前画像：{profile.major} / {profile.grade} / {profile.goal}
+                  </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Link href="/opportunities#hot-opportunities" className="rounded-full bg-blue-600 px-4 py-2 text-xs font-black text-white shadow-sm active:scale-95">
@@ -602,9 +704,9 @@ function OpportunityRadar() {
 
         <div className="mt-5 flex items-center justify-center gap-1 text-xs font-black text-blue-700">
           <span>AI 正在分析你的成长机会</span>
-          <motion.span animate={{ opacity: [0.25, 1, 0.25] }} transition={{ repeat: Infinity, duration: 1.2 }}>●</motion.span>
-          <motion.span animate={{ opacity: [0.25, 1, 0.25] }} transition={{ repeat: Infinity, duration: 1.2, delay: 0.18 }}>●</motion.span>
-          <motion.span animate={{ opacity: [0.25, 1, 0.25] }} transition={{ repeat: Infinity, duration: 1.2, delay: 0.36 }}>●</motion.span>
+          <motion.span animate={reduceMotion ? { opacity: 0.8 } : { opacity: [0.25, 1, 0.25] }} transition={{ repeat: reduceMotion ? 0 : Infinity, duration: 1.2 }}>●</motion.span>
+          <motion.span animate={reduceMotion ? { opacity: 0.8 } : { opacity: [0.25, 1, 0.25] }} transition={{ repeat: reduceMotion ? 0 : Infinity, duration: 1.2, delay: 0.18 }}>●</motion.span>
+          <motion.span animate={reduceMotion ? { opacity: 0.8 } : { opacity: [0.25, 1, 0.25] }} transition={{ repeat: reduceMotion ? 0 : Infinity, duration: 1.2, delay: 0.36 }}>●</motion.span>
         </div>
       </div>
     </motion.div>
@@ -612,6 +714,8 @@ function OpportunityRadar() {
 }
 
 function OpportunityPulseCard({ stats }: { stats: ReadonlyArray<readonly [string, number]> }) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <div className="mt-6 rounded-[28px] border border-blue-100 bg-white/82 p-5 shadow-xl backdrop-blur-xl">
       <div className="flex items-center justify-between gap-3">
@@ -620,8 +724,8 @@ function OpportunityPulseCard({ stats }: { stats: ReadonlyArray<readonly [string
           <h3 className="mt-2 text-2xl font-black text-slate-950">成长机会脉冲</h3>
         </div>
         <motion.span
-          animate={{ scale: [1, 1.12, 1], opacity: [0.72, 1, 0.72] }}
-          transition={{ repeat: Infinity, duration: 2 }}
+          animate={reduceMotion ? { scale: 1, opacity: 1 } : { scale: [1, 1.12, 1], opacity: [0.72, 1, 0.72] }}
+          transition={{ repeat: reduceMotion ? 0 : Infinity, duration: 2 }}
           className="grid size-12 place-items-center rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 text-xl font-black text-white shadow-glow"
         >
           YPI
@@ -639,8 +743,8 @@ function OpportunityPulseCard({ stats }: { stats: ReadonlyArray<readonly [string
       </div>
       <div className="mt-5 h-2 overflow-hidden rounded-full bg-blue-50">
         <motion.div
-          animate={{ x: ["-30%", "115%"] }}
-          transition={{ repeat: Infinity, duration: 2.8, ease: "easeInOut" }}
+          animate={reduceMotion ? { x: "0%" } : { x: ["-30%", "115%"] }}
+          transition={{ repeat: reduceMotion ? 0 : Infinity, duration: 2.8, ease: "easeInOut" }}
           className="h-full w-1/2 rounded-full bg-gradient-to-r from-blue-600 to-cyan-400"
         />
       </div>

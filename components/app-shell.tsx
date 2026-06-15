@@ -48,8 +48,8 @@ const navGroups = [
 const utilityItems = [
   { href: "/opportunities#my-opportunities", label: "我的机会", icon: "⭐" },
   { href: "/opportunity-admin", label: "机会管理", icon: "🛠" },
-  { href: "/chat", label: "我的收藏", icon: "📌" },
-  { href: "/chat", label: "历史对话", icon: "🕒" },
+  { href: "/chat", label: "我的收藏", icon: "📌", disabled: true },
+  { href: "/chat", label: "历史对话", icon: "🕒", disabled: true },
 ];
 
 const mobileItems = [
@@ -110,7 +110,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <span className="relative grid size-10 place-items-center overflow-hidden rounded-xl border border-blue-100 bg-white">
-              <Image src="/logo.png" alt="扬工智行" fill className="object-contain p-1" />
+              <Image src="/logo-small.png" alt="扬工智行" fill sizes="40px" className="object-contain p-1" />
             </span>
             <span>
               <span className="block text-sm font-black text-slate-950 dark:text-slate-100">扬工智行</span>
@@ -214,7 +214,7 @@ function SidebarContent({
     <div className="flex min-h-full flex-col gap-5">
       <Link href="/" onClick={onNavigate} className="flex items-center gap-3">
         <span className="relative grid size-12 place-items-center overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
-          <Image src="/logo.png" alt="扬工智行" fill className="object-contain p-1.5" />
+          <Image src="/logo-small.png" alt="扬工智行" fill sizes="48px" className="object-contain p-1.5" />
         </span>
         <span className="min-w-0">
           <span className="block whitespace-normal break-words text-lg font-black text-slate-950 dark:text-slate-100">扬工智行</span>
@@ -273,19 +273,35 @@ function SidebarContent({
         })}
 
         <div className="border-t border-blue-100 pt-3 dark:border-slate-700">
-          {utilityItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              onClick={onNavigate}
-              className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-600 transition-all duration-300 hover:translate-x-1 hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300"
-            >
-              <span className="w-5 text-center transition-transform duration-300 group-hover:scale-110">
-                {item.icon}
-              </span>
-              {item.label}
-            </Link>
-          ))}
+          {utilityItems.map((item) =>
+            item.disabled ? (
+              <button
+                key={item.label}
+                type="button"
+                disabled
+                title="即将上线"
+                className="group flex w-full cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-400 opacity-75 transition-all duration-300 dark:text-slate-500"
+              >
+                <span className="w-5 text-center">{item.icon}</span>
+                <span className="flex-1">{item.label}</span>
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-black text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                  即将上线
+                </span>
+              </button>
+            ) : (
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={onNavigate}
+                className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-600 transition-all duration-300 hover:translate-x-1 hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300"
+              >
+                <span className="w-5 text-center transition-transform duration-300 group-hover:scale-110">
+                  {item.icon}
+                </span>
+                {item.label}
+              </Link>
+            ),
+          )}
         </div>
       </nav>
 

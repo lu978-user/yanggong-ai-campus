@@ -18,7 +18,13 @@ import { motion } from "framer-motion";
 import { AppShell } from "@/components/app-shell";
 import { InlineAgent } from "@/components/inline-agent";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { defaultOpportunities, getOpportunities, type Opportunity } from "@/data/opportunities";
+import {
+  defaultOpportunities,
+  getOpportunities,
+  saveOpportunities,
+  type Opportunity,
+  type OpportunityFollowStatus,
+} from "@/data/opportunities";
 
 const colleges = [
   {
@@ -163,6 +169,14 @@ export default function GrowthPage() {
       setDiagnosing(false);
       setDiagnosed(true);
     }, 900);
+  }
+
+  function updateOpportunityStatus(id: string, followStatus: OpportunityFollowStatus) {
+    const next = opportunityLibrary.map((item) =>
+      item.id === id ? { ...item, followStatus } : item,
+    );
+    setOpportunityLibrary(next);
+    saveOpportunities(next);
   }
 
   return (
@@ -388,6 +402,25 @@ export default function GrowthPage() {
                     <p className="mt-3 rounded-2xl bg-white/80 px-3 py-2 text-xs font-black text-blue-700">
                       适配：{item.fit}
                     </p>
+                    <div className="mt-3 grid gap-2">
+                      <p className="text-xs font-black text-slate-500">推进状态</p>
+                      <div className="flex flex-wrap gap-2">
+                        {(["已收藏", "准备中", "已报名"] as const).map((status) => (
+                          <button
+                            key={status}
+                            type="button"
+                            onClick={() => updateOpportunityStatus(item.opportunity.id, status)}
+                            className={`rounded-full px-3 py-1.5 text-xs font-black transition-all duration-300 active:scale-95 ${
+                              item.opportunity.followStatus === status
+                                ? "bg-blue-600 text-white shadow-glow"
+                                : "border border-blue-100 bg-white/82 text-blue-700 hover:bg-blue-50"
+                            }`}
+                          >
+                            {status}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </motion.article>
                 ))}
               </div>

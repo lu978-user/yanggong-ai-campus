@@ -16,13 +16,15 @@ type WechatArticleResult =
     };
 
 const PARSE_FAILURE = "公众号文章解析失败，请复制文章正文后粘贴。";
+const ALLOWED_WECHAT_HOST = "mp.weixin.qq.com";
+const BLOCKED_HOSTS = new Set(["localhost", "127.0.0.1", "0.0.0.0", "::1"]);
 
 function isAllowedWechatUrl(value: string) {
   try {
     const url = new URL(value);
     if (url.protocol !== "https:") return false;
-    if (url.hostname !== "mp.weixin.qq.com") return false;
-    if (["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(url.hostname)) return false;
+    if (url.hostname !== ALLOWED_WECHAT_HOST) return false;
+    if (BLOCKED_HOSTS.has(url.hostname)) return false;
     return true;
   } catch {
     return false;
@@ -110,7 +112,12 @@ async function fetchWechatHtml(url: string, depth = 0): Promise<{ html: string; 
     throw new Error(`Wechat article request failed: ${response.status}`);
   }
 
-  return { html: await response.text(), finalUrl: url };
+  const finalUrl = response.url || url;
+  if (!isAllowedWechatUrl(finalUrl)) {
+    throw new Error("Unsafe final URL");
+  }
+
+  return { html: await response.text(), finalUrl };
 }
 
 export async function POST(request: Request) {
