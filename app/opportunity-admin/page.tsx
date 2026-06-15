@@ -8,6 +8,7 @@ import {
   defaultOpportunities,
   getOpportunities,
   opportunityCategories,
+  opportunityFollowStatuses,
   opportunityStatuses,
   resetOpportunities,
   saveOpportunities,
@@ -20,6 +21,7 @@ const emptyOpportunity: Opportunity = {
   category: "校园岗位",
   deadline: "",
   status: "报名中",
+  followStatus: "未关注",
   recommendLevel: 4,
   targetAudience: [],
   description: "",
@@ -27,6 +29,10 @@ const emptyOpportunity: Opportunity = {
   applyMethod: "",
   source: "",
   tags: [],
+  growthValues: [],
+  completedSkills: [],
+  relatedMajors: [],
+  relatedGoals: [],
   isFeatured: true,
 };
 
@@ -36,7 +42,7 @@ function createId() {
 
 function splitList(value: string) {
   return value
-    .split(/[，,]/)
+    .split(/[,，]/)
     .map((item) => item.trim())
     .filter(Boolean);
 }
@@ -50,6 +56,10 @@ export default function OpportunityAdminPage() {
   const [editing, setEditing] = useState<Opportunity | null>(null);
   const [audienceText, setAudienceText] = useState("");
   const [tagsText, setTagsText] = useState("");
+  const [growthValuesText, setGrowthValuesText] = useState("");
+  const [completedSkillsText, setCompletedSkillsText] = useState("");
+  const [relatedMajorsText, setRelatedMajorsText] = useState("");
+  const [relatedGoalsText, setRelatedGoalsText] = useState("");
 
   useEffect(() => {
     setOpportunities(getOpportunities());
@@ -65,12 +75,20 @@ export default function OpportunityAdminPage() {
     setEditing(draft);
     setAudienceText("");
     setTagsText("");
+    setGrowthValuesText("");
+    setCompletedSkillsText("");
+    setRelatedMajorsText("");
+    setRelatedGoalsText("");
   }
 
   function startEdit(item: Opportunity) {
     setEditing({ ...item });
     setAudienceText(joinList(item.targetAudience));
     setTagsText(joinList(item.tags));
+    setGrowthValuesText(joinList(item.growthValues));
+    setCompletedSkillsText(joinList(item.completedSkills));
+    setRelatedMajorsText(joinList(item.relatedMajors));
+    setRelatedGoalsText(joinList(item.relatedGoals));
   }
 
   function removeOpportunity(id: string) {
@@ -101,8 +119,13 @@ export default function OpportunityAdminPage() {
     const nextItem: Opportunity = {
       ...editing,
       title: editing.title.trim() || "未命名机会",
+      followStatus: editing.followStatus ?? "未关注",
       targetAudience: splitList(audienceText),
       tags: splitList(tagsText),
+      growthValues: splitList(growthValuesText),
+      completedSkills: splitList(completedSkillsText),
+      relatedMajors: splitList(relatedMajorsText),
+      relatedGoals: splitList(relatedGoalsText),
     };
     const exists = opportunities.some((item) => item.id === nextItem.id);
     const next = exists
@@ -122,7 +145,7 @@ export default function OpportunityAdminPage() {
               <p className="text-sm font-black text-blue-600">Local Admin</p>
               <h1 className="mt-1 text-4xl font-black text-slate-950">机会内容管理</h1>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-                当前为本地管理模式，数据保存在当前浏览器中。更换设备或清除缓存后需要重新维护。
+                当前为本地管理模式，数据保存在当前浏览器中。你可以维护机会内容，也可以更新每条机会的跟进状态。
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -209,13 +232,26 @@ export default function OpportunityAdminPage() {
                   placeholder="例如：2026-06-25 或 6月25日"
                 />
               </Field>
-              <Field label="状态">
+              <Field label="报名状态">
                 <select
                   value={editing.status}
                   onChange={(event) => updateEditing("status", event.target.value as Opportunity["status"])}
                   className="admin-input"
                 >
                   {opportunityStatuses.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="跟进状态">
+                <select
+                  value={editing.followStatus}
+                  onChange={(event) => updateEditing("followStatus", event.target.value as Opportunity["followStatus"])}
+                  className="admin-input"
+                >
+                  {opportunityFollowStatuses.map((item) => (
                     <option key={item} value={item}>
                       {item}
                     </option>
@@ -281,6 +317,38 @@ export default function OpportunityAdminPage() {
                     placeholder="竞赛，证书，实践"
                   />
                 </Field>
+                <Field label="成长价值标签，逗号分隔">
+                  <input
+                    value={growthValuesText}
+                    onChange={(event) => setGrowthValuesText(event.target.value)}
+                    className="admin-input"
+                    placeholder="组织协调，沟通表达，学生工作经验"
+                  />
+                </Field>
+                <Field label="已完成获得能力，逗号分隔">
+                  <input
+                    value={completedSkillsText}
+                    onChange={(event) => setCompletedSkillsText(event.target.value)}
+                    className="admin-input"
+                    placeholder="组织能力，表达能力，项目经验"
+                  />
+                </Field>
+                <Field label="关联专业，逗号分隔">
+                  <input
+                    value={relatedMajorsText}
+                    onChange={(event) => setRelatedMajorsText(event.target.value)}
+                    className="admin-input"
+                    placeholder="计算机应用技术，软件技术，人工智能技术应用"
+                  />
+                </Field>
+                <Field label="关联目标，逗号分隔">
+                  <input
+                    value={relatedGoalsText}
+                    onChange={(event) => setRelatedGoalsText(event.target.value)}
+                    className="admin-input"
+                    placeholder="竞赛，就业，专转本"
+                  />
+                </Field>
                 <label className="flex items-center gap-3 rounded-2xl border border-blue-100 bg-white/70 px-4 py-3 text-sm font-black text-slate-700">
                   <input
                     type="checkbox"
@@ -302,6 +370,7 @@ export default function OpportunityAdminPage() {
                 <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-black text-white">{item.category}</span>
                 <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">截止：{item.deadline || "未设置"}</span>
                 <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">{item.status}</span>
+                <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-700">跟进：{item.followStatus}</span>
                 {item.isFeatured && (
                   <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-black text-amber-700">推荐</span>
                 )}
@@ -315,6 +384,14 @@ export default function OpportunityAdminPage() {
                     {tag}
                   </span>
                 ))}
+              </div>
+              <div className="mt-3 grid gap-2">
+                {item.growthValues.length > 0 && (
+                  <AdminTagGroup label="成长价值" tags={item.growthValues} tone="cyan" />
+                )}
+                {item.completedSkills.length > 0 && (
+                  <AdminTagGroup label="完成能力" tags={item.completedSkills} tone="violet" />
+                )}
               </div>
               <div className="mt-5 flex flex-wrap gap-2">
                 <button
@@ -348,5 +425,22 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
       <span className="text-sm font-black text-slate-700">{label}</span>
       {children}
     </label>
+  );
+}
+
+function AdminTagGroup({ label, tags, tone }: { label: string; tags: string[]; tone: "cyan" | "violet" }) {
+  const toneClass = tone === "cyan" ? "bg-cyan-50 text-cyan-700" : "bg-violet-50 text-violet-700";
+
+  return (
+    <div>
+      <p className="mb-2 text-xs font-black text-slate-500">{label}</p>
+      <div className="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <span key={tag} className={`rounded-full px-3 py-1 text-xs font-bold ${toneClass}`}>
+            {tag}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }

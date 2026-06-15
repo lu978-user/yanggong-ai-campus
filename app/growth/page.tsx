@@ -1,12 +1,24 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useState } from "react";
-import { BrainCircuit, BriefcaseBusiness, Medal, Radar, ScrollText, TrendingUp } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import {
+  BrainCircuit,
+  BriefcaseBusiness,
+  CalendarCheck,
+  CheckCircle2,
+  ExternalLink,
+  Medal,
+  Radar,
+  ScrollText,
+  TrendingUp,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { AppShell } from "@/components/app-shell";
 import { InlineAgent } from "@/components/inline-agent";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { defaultOpportunities, getOpportunities, type Opportunity } from "@/data/opportunities";
 
 const colleges = [
   {
@@ -32,10 +44,10 @@ const colleges = [
 ];
 
 const timeline = [
-  ["大一", "基础学习", "夯实公共课、专业基础和学习习惯。"],
-  ["大二", "专业提升", "完成核心技能训练，开始证书和竞赛准备。"],
-  ["大三", "项目实践", "进入真实项目、实训基地和作品集建设。"],
-  ["大四", "就业升学", "完成专转本、就业方向或创业项目收口。"],
+  ["大一", "基础学习", "夯实公共课、专业基础和学习习惯，尽早了解竞赛、证书与校园机会。"],
+  ["大二", "专业提升", "完成核心技能训练，开始证书规划、竞赛准备和项目实践。"],
+  ["大三", "项目实践", "进入真实项目、实训基地和作品集建设，积累可展示成果。"],
+  ["大四", "就业升学", "完成专转本、就业方向或创业项目收口，形成简历和面试材料。"],
 ];
 
 const resultCards = [
@@ -45,6 +57,74 @@ const resultCards = [
   { title: "就业方向", icon: BriefcaseBusiness, items: ["技术实施", "开发测试", "运营支持", "升学深造"] },
 ];
 
+type GrowthOpportunity = {
+  opportunity: Opportunity;
+  matchScore: number;
+  reason: string;
+  fit: string;
+};
+
+function getGoalKeywords(goal: string) {
+  const goalMap: Record<string, string[]> = {
+    专转本: ["专转本", "升学", "学习资源"],
+    就业: ["就业", "实习", "职业发展", "学生工作"],
+    竞赛获奖: ["竞赛", "技能竞赛", "创新创业"],
+    考证: ["证书", "考证", "专转本", "学习资源"],
+    创业: ["创新创业", "创业", "项目实践"],
+  };
+
+  return [goal, ...(goalMap[goal] ?? [])];
+}
+
+function includesAny(source: string[], targets: string[]) {
+  return source.some((item) => targets.some((target) => item.includes(target) || target.includes(item)));
+}
+
+function matchOpportunity(opportunity: Opportunity, major: string, grade: string, goal: string): GrowthOpportunity {
+  const goalKeywords = getGoalKeywords(goal);
+  const majorMatched =
+    opportunity.relatedMajors.includes("全部专业") ||
+    opportunity.relatedMajors.includes(major) ||
+    opportunity.targetAudience.includes(major);
+  const goalMatched =
+    includesAny(opportunity.relatedGoals, goalKeywords) ||
+    includesAny(opportunity.tags, goalKeywords) ||
+    includesAny(opportunity.growthValues, goalKeywords);
+  const gradeMatched = opportunity.targetAudience.includes(grade);
+  const score = Math.min(
+    98,
+    30 + (majorMatched ? 28 : 0) + (goalMatched ? 28 : 0) + (gradeMatched ? 6 : 0) + opportunity.recommendLevel * 4,
+  );
+  const reason = goalMatched
+    ? `与“${goal}”目标高度相关，可沉淀${opportunity.growthValues.slice(0, 2).join("、") || "成长经历"}。`
+    : `可补充${grade}阶段的实践经历，提升${opportunity.growthValues.slice(0, 2).join("、") || "综合能力"}。`;
+
+  return {
+    opportunity,
+    matchScore: score,
+    reason,
+    fit: `${majorMatched ? major : "跨专业可参与"} / ${goalMatched ? goal : "综合成长"}`,
+  };
+}
+
+function getRecommendedOpportunities(opportunities: Opportunity[], major: string, grade: string, goal: string): GrowthOpportunity[] {
+  return opportunities
+    .map((opportunity) => matchOpportunity(opportunity, major, grade, goal))
+    .sort((left, right) => right.matchScore - left.matchScore)
+    .slice(0, 4);
+}
+
+function getMonthlyActions(recommended: GrowthOpportunity[]) {
+  const first = recommended[0]?.opportunity;
+  const second = recommended[1]?.opportunity;
+  return [
+    "收藏一个成长机会",
+    first ? `关注「${first.title}」报名节点` : "关注一个竞赛报名",
+    second ? `推进「${second.title}」准备事项` : "参加一次校园活动",
+    "完成一次能力提升并记录成长收获",
+  ];
+}
+
 export default function GrowthPage() {
   const [diagnosed, setDiagnosed] = useState(false);
   const [diagnosing, setDiagnosing] = useState(false);
@@ -53,8 +133,28 @@ export default function GrowthPage() {
   const [grade, setGrade] = useState("大一");
   const [goal, setGoal] = useState("专转本");
   const [interest, setInterest] = useState("AI应用开发");
+  const [opportunityLibrary, setOpportunityLibrary] = useState<Opportunity[]>(defaultOpportunities);
 
   const currentCollege = colleges.find((item) => item.name === college) ?? colleges[0];
+
+  useEffect(() => {
+    function refreshOpportunities() {
+      setOpportunityLibrary(getOpportunities());
+    }
+
+    refreshOpportunities();
+    window.addEventListener("focus", refreshOpportunities);
+    return () => window.removeEventListener("focus", refreshOpportunities);
+  }, []);
+
+  const recommendedOpportunities = useMemo(
+    () => getRecommendedOpportunities(opportunityLibrary, major, grade, goal),
+    [opportunityLibrary, major, grade, goal],
+  );
+  const monthlyActions = useMemo(
+    () => getMonthlyActions(recommendedOpportunities),
+    [recommendedOpportunities],
+  );
 
   function startDiagnosis() {
     setDiagnosing(true);
@@ -72,7 +172,7 @@ export default function GrowthPage() {
           <p className="text-sm font-black text-blue-600">Growth Intelligence</p>
           <h1 className="mt-2 text-4xl font-black text-slate-950 sm:text-5xl">AI成长报告</h1>
           <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-600">
-            支持全校专业分类、年级目标和兴趣方向输入，结合Dify智能体生成成长评分、学习路线、竞赛证书、就业方向与专转本建议。
+            支持全校专业分类、年级目标和兴趣方向输入，生成成长评分、学习路线、竞赛证书、就业方向，并联动成长机会中心推荐可参与的校园机会。
           </p>
         </section>
 
@@ -227,6 +327,105 @@ export default function GrowthPage() {
                 })}
               </div>
             </div>
+
+            <section className="premium-card p-5">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p className="text-sm font-black text-blue-600">Linked Opportunities</p>
+                  <h2 className="text-2xl font-black text-slate-950">推荐成长机会</h2>
+                </div>
+                <Link
+                  href="/opportunities"
+                  className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2.5 text-sm font-black text-white shadow-glow transition hover:-translate-y-0.5 hover:bg-blue-700 active:scale-95"
+                >
+                  前往成长机会中心
+                  <ExternalLink className="size-4" />
+                </Link>
+              </div>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                根据当前方案：{major} / {grade} / {goal}，为你匹配可参与、可收藏、可跟进的成长机会。
+              </p>
+              <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                {recommendedOpportunities.map((item, index) => (
+                  <motion.article
+                    key={item.opportunity.id}
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.06 }}
+                    className="rounded-[24px] border border-blue-100 bg-gradient-to-br from-white to-blue-50/70 p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-black text-cyan-700">
+                        {item.opportunity.category}
+                      </span>
+                      <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">
+                        {item.matchScore}% 匹配
+                      </span>
+                    </div>
+                    <h3 className="mt-4 text-lg font-black text-slate-950">{item.opportunity.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">{item.reason}</p>
+                    <div className="mt-3 grid gap-2 text-xs font-black text-slate-600">
+                      <p className="rounded-2xl bg-white/80 px-3 py-2 text-blue-700">
+                        截止：{item.opportunity.deadline || "以通知为准"}
+                      </p>
+                      <p className="rounded-2xl bg-white/80 px-3 py-2 text-amber-600">
+                        推荐指数：{"★".repeat(item.opportunity.recommendLevel)}{"☆".repeat(5 - item.opportunity.recommendLevel)}
+                      </p>
+                      <p className="rounded-2xl bg-white/80 px-3 py-2 text-violet-700">
+                        跟进状态：{item.opportunity.followStatus}
+                      </p>
+                    </div>
+                    {item.opportunity.growthValues.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {item.opportunity.growthValues.slice(0, 3).map((value) => (
+                          <span key={value} className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-black text-cyan-700">
+                            {value}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <p className="mt-3 rounded-2xl bg-white/80 px-3 py-2 text-xs font-black text-blue-700">
+                      适配：{item.fit}
+                    </p>
+                  </motion.article>
+                ))}
+              </div>
+            </section>
+
+            <section className="premium-card p-5">
+              <div className="flex items-center gap-3">
+                <span className="grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-glow">
+                  <CalendarCheck className="size-6" />
+                </span>
+                <div>
+                  <p className="text-sm font-black text-blue-600">Monthly Action Plan</p>
+                  <h2 className="text-2xl font-black text-slate-950">本月行动清单</h2>
+                </div>
+              </div>
+              <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                {monthlyActions.map((item, index) => (
+                  <motion.div
+                    key={item}
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.05 }}
+                    className="flex items-start gap-3 rounded-[22px] border border-blue-100 bg-blue-50/55 p-4"
+                  >
+                    <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-blue-600 text-white">
+                      <CheckCircle2 className="size-4" />
+                    </span>
+                    <div>
+                      <p className="font-black text-slate-950">{item}</p>
+                      <p className="mt-1 text-xs leading-5 text-slate-500">
+                        建议在本月内完成，作为成长报告的下一步行动。
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </section>
 
             <section className="premium-card p-5">
               <div className="flex flex-wrap items-end justify-between gap-3">

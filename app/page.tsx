@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -24,6 +22,7 @@ import { AssistantPanel } from "@/components/assistant-panel";
 import { CountUp } from "@/components/count-up";
 import { InlineAgent } from "@/components/inline-agent";
 import { ParticleBackground } from "@/components/particle-background";
+import { defaultOpportunities, getOpportunities, type Opportunity, type OpportunityFollowStatus } from "@/data/opportunities";
 
 const opportunityCards = [
   {
@@ -54,15 +53,6 @@ const opportunityCards = [
     audience: "兴趣拓展型学生",
     stars: "★★★★☆",
   },
-];
-
-const opportunityStats = [
-  ["今日机会", 12],
-  ["正在报名", 8],
-  ["竞赛项目", 5],
-  ["校园活动", 18],
-  ["成长规划", 5241],
-  ["服务学生", 1276],
 ];
 
 const serviceCards = [
@@ -140,124 +130,162 @@ const growthLoop = [
   { title: "就业升学", desc: "形成简历经历与升学竞争力", icon: Route },
 ];
 
-export default function DashboardPage() {
-  const router = useRouter();
-  const [goal, setGoal] = useState("");
+const radarProfile = {
+  majors: ["计算机应用技术", "软件技术", "人工智能技术应用", "大数据技术", "全部专业"],
+  goals: ["竞赛", "就业", "专转本", "综合素质", "学生干部", "学习资源", "职业发展"],
+};
 
-  function startPlanning() {
-    const query = goal.trim();
-    const target = query
-      ? `/opportunities?goal=${encodeURIComponent(query)}`
-      : "/opportunities";
-    router.push(target);
+function stars(score: number) {
+  return "★".repeat(score) + "☆".repeat(5 - score);
+}
+
+function isSameDay(value: string | undefined, date = new Date()) {
+  if (!value) return false;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return false;
+  return (
+    parsed.getFullYear() === date.getFullYear() &&
+    parsed.getMonth() === date.getMonth() &&
+    parsed.getDate() === date.getDate()
+  );
+}
+
+function daysUntilDeadline(deadline: string) {
+  const text = deadline.trim();
+  if (!text || text.includes("长期")) return Number.POSITIVE_INFINITY;
+  if (text.includes("本周")) return 7;
+  const remaining = text.match(/还剩\s*(\d+)\s*天/);
+  if (remaining) return Number(remaining[1]);
+
+  const monthDay = text.match(/(\d{1,2})月(\d{1,2})日/);
+  if (!monthDay) return Number.POSITIVE_INFINITY;
+
+  const now = new Date();
+  const deadlineDate = new Date(now.getFullYear(), Number(monthDay[1]) - 1, Number(monthDay[2]), 23, 59, 59);
+  const diff = deadlineDate.getTime() - now.getTime();
+  return Math.ceil(diff / 86_400_000);
+}
+
+function isDeadlineSoon(deadline: string) {
+  const days = daysUntilDeadline(deadline);
+  return days >= 0 && days <= 7;
+}
+
+function includesAny(source: string[], targets: string[]) {
+  return source.some((item) => targets.some((target) => item.includes(target) || target.includes(item)));
+}
+
+function matchUserProfile(opportunity: Opportunity) {
+  let score = Math.min(25, opportunity.recommendLevel * 5);
+  const majorMatched =
+    opportunity.relatedMajors.includes("全部专业") || includesAny(opportunity.relatedMajors, radarProfile.majors);
+  const goalMatched =
+    includesAny(opportunity.relatedGoals, radarProfile.goals) ||
+    includesAny(opportunity.tags, radarProfile.goals) ||
+    includesAny(opportunity.growthValues, radarProfile.goals);
+  const urgent = isDeadlineSoon(opportunity.deadline);
+
+  if (majorMatched || goalMatched) score += 30;
+  if (urgent) score += 20;
+  if (opportunity.recommendLevel >= 4) score += 20;
+
+  return Math.min(100, score);
+}
+
+function buildRadarReason(opportunity: Opportunity, score: number, urgent: boolean) {
+  if (urgent) {
+    return `该机会距离截止较近，匹配度 ${score}%，建议优先确认报名条件。`;
   }
+  if (score >= 70) {
+    return `该机会与你的成长画像高度匹配，可沉淀${opportunity.growthValues.slice(0, 2).join("、") || "成长经历"}。`;
+  }
+  return `该机会推荐指数较高，可作为拓展校园经历与能力标签的候选项。`;
+}
 
+function getRadarNodes(opportunities: Opportunity[]) {
+  return opportunities
+    .map((opportunity) => {
+      const score = matchUserProfile(opportunity);
+      const isUrgent = isDeadlineSoon(opportunity.deadline);
+      return {
+        opportunity,
+        score,
+        isUrgent,
+        reason: buildRadarReason(opportunity, score, isUrgent),
+      };
+    })
+    .filter(({ opportunity, isUrgent }) => opportunity.followStatus !== "已完成" && (opportunity.recommendLevel >= 3 || isUrgent))
+    .sort((left, right) => Number(right.isUrgent) - Number(left.isUrgent) || right.score - left.score)
+    .slice(0, 8);
+}
+
+function getFollowStatusClass(status: OpportunityFollowStatus, isUrgent: boolean) {
+  if (isUrgent) return "border-orange-200 bg-orange-50 text-orange-700 shadow-[0_0_24px_rgba(251,146,60,0.46)]";
+  const styles: Record<OpportunityFollowStatus, string> = {
+    未关注: "border-white/25 bg-white/72 text-blue-900",
+    已收藏: "border-cyan-200/70 bg-cyan-50/90 text-cyan-800 shadow-[0_0_20px_rgba(103,232,249,0.38)]",
+    准备中: "border-blue-200/80 bg-blue-50/95 text-blue-800 shadow-[0_0_24px_rgba(96,165,250,0.45)]",
+    已报名: "border-emerald-200/80 bg-emerald-50/95 text-emerald-800 shadow-[0_0_26px_rgba(52,211,153,0.5)]",
+    已完成: "border-slate-200 bg-slate-100 text-slate-500",
+  };
+  return styles[status];
+}
+
+export default function DashboardPage() {
   return (
     <AppShell>
-      <div className="grid min-h-screen gap-5 px-4 py-4 sm:px-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+      <div className="grid min-h-screen min-w-0 gap-5 overflow-x-hidden px-4 py-4 sm:px-6 xl:grid-cols-[minmax(0,1fr)_420px]">
         <main className="min-w-0 space-y-6">
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: "easeOut" }}
-            className="premium-card relative min-h-[680px] overflow-hidden p-6 sm:p-8 lg:p-10"
+            className="premium-card relative overflow-hidden p-6 sm:p-8 lg:min-h-[680px] lg:p-10"
           >
-            <ParticleBackground className="z-0 opacity-75" />
+            <ParticleBackground className="z-0 opacity-70" />
             <div className="pointer-events-none absolute -right-32 -top-32 h-[520px] w-[520px] rounded-full bg-cyan-300/25 blur-3xl" />
             <div className="pointer-events-none absolute bottom-0 left-1/4 h-[420px] w-[420px] rounded-full bg-blue-500/10 blur-3xl" />
 
-            <div className="relative z-10 grid min-h-[600px] items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
-              <div>
+            <div className="relative z-10 grid items-center gap-10 lg:min-h-[600px] lg:grid-cols-[1.02fr_0.98fr]">
+              <div className="min-w-0">
                 <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/80 px-4 py-2 text-sm font-black text-blue-700 shadow-sm backdrop-blur-xl">
                   <Sparkles className="size-4" />
                   AI Opportunity Engine
                 </div>
                 <h1 className="text-gradient-brand text-5xl font-black tracking-normal sm:text-7xl">
-                  AI发现你的成长机会
+                  让每一位学生不错过成长机会
                 </h1>
-                <p className="mt-5 text-2xl font-black text-blue-700 sm:text-3xl">
-                  不错过每一个属于你的机会
-                </p>
                 <p className="mt-6 max-w-3xl text-base leading-8 text-slate-600 sm:text-lg">
-                  扬工智行通过AI整合校园活动、竞赛报名、班助招募、社团活动、学习资源与关怀服务，帮助学生发现机会、规划成长、获得支持。
+                  YPI 扬工智行通过 AI 帮助学生发现校园机会、规划成长路径、获得学习与关怀支持。
                 </p>
 
-                <div className="mt-7 rounded-[28px] border border-white/80 bg-white/82 p-3 shadow-xl backdrop-blur-2xl">
-                  <div className="flex flex-col gap-3 md:flex-row">
-                    <input
-                      value={goal}
-                      onChange={(event) => setGoal(event.target.value)}
-                      placeholder="输入你的专业、年级或目标，例如：我是计算机应用技术专业大一，想参加竞赛"
-                      className="min-h-14 flex-1 rounded-[22px] border border-blue-100 bg-blue-50/55 px-5 text-sm font-bold text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(37,99,235,0.12)]"
-                    />
-                    <button
-                      type="button"
-                      onClick={startPlanning}
-                      className="inline-flex min-h-14 items-center justify-center gap-2 rounded-[22px] bg-gradient-to-r from-blue-600 to-cyan-500 px-6 text-sm font-black text-white shadow-glow transition hover:-translate-y-0.5 active:scale-95"
-                    >
-                      开始规划
-                      <ArrowRight className="size-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mt-7 flex flex-wrap gap-3">
+                <div className="mt-8 flex flex-wrap gap-3">
                   <Link
                     href="/opportunities"
                     className="group inline-flex items-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-bold text-white shadow-xl transition-all duration-300 hover:scale-[1.02] hover:bg-blue-700 active:scale-95"
                   >
-                    让AI帮我发现机会
+                    进入成长机会中心
                     <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Link>
                   <Link
-                    href="/map"
+                    href="/growth"
                     className="group inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/82 px-6 py-3 text-sm font-bold text-blue-700 shadow-sm backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:bg-blue-50 active:scale-95"
                   >
-                    查看校园地图
+                    开始成长规划
                     <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Link>
                 </div>
               </div>
 
-              <motion.div
-                animate={{ y: [0, -12, 0] }}
-                transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut" }}
-                className="relative overflow-hidden rounded-[34px] border border-white/90 bg-gradient-to-br from-white via-blue-50 to-cyan-50 p-5 shadow-[0_34px_110px_rgba(37,99,235,0.22)]"
-              >
-                <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-cyan-300/30 blur-3xl" />
-                <div className="relative flex items-center gap-3">
-                  <span className="relative grid size-14 place-items-center overflow-hidden rounded-2xl bg-white shadow-sm">
-                    <Image src="/logo.png" alt="扬工智行Logo" fill priority className="object-contain p-2" />
-                  </span>
-                  <div>
-                    <p className="text-2xl font-black tracking-tight text-slate-950">YPI</p>
-                    <p className="text-sm font-black text-slate-700">扬工智行</p>
-                    <p className="text-xs font-bold text-blue-600">AI-Powered Student Growth Platform</p>
-                  </div>
-                </div>
-
-                <div className="relative mt-6 grid gap-3">
-                  {opportunityCards.slice(0, 3).map((item) => (
-                    <div key={item.title} className="rounded-[24px] border border-blue-100 bg-white/78 p-4 shadow-sm backdrop-blur-xl">
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">{item.type}</span>
-                        <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-black text-amber-700">{item.deadline}</span>
-                      </div>
-                      <p className="mt-3 text-lg font-black text-slate-950">{item.title}</p>
-                      <p className="mt-1 text-xs font-bold text-slate-500">{item.audience}</p>
-                      <p className="mt-2 text-sm font-black text-amber-500">{item.stars}</p>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
+              <OpportunityRadar />
             </div>
           </motion.section>
 
           <section className="premium-card p-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-sm font-black text-blue-600">Today Opportunities</p>
-                <h2 className="mt-1 text-3xl font-black text-slate-950">今日机会推荐</h2>
+                <p className="text-sm font-black text-blue-600">Today Growth Opportunities</p>
+                <h2 className="mt-1 text-3xl font-black text-slate-950">今日成长机会推荐</h2>
               </div>
               <Link href="/opportunities" className="text-sm font-black text-blue-700">
                 查看全部机会 →
@@ -277,9 +305,9 @@ export default function DashboardPage() {
                     <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-black text-white">{item.type}</span>
                     <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-black text-amber-700">{item.deadline}</span>
                   </div>
-                  <h3 className="mt-4 text-xl font-black text-slate-950">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-500">适合：{item.audience}</p>
-                  <p className="mt-3 text-base font-black text-amber-500">{item.stars}</p>
+                  <h3 className="mt-4 text-xl font-black text-slate-950 dark:text-slate-100">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-500">适合人群：{item.audience}</p>
+                  <p className="mt-3 text-base font-black text-amber-500">推荐指数：{item.stars}</p>
                   <div className="mt-5 flex flex-wrap gap-2">
                     <Link href="/opportunities" className="rounded-full bg-blue-600 px-4 py-2 text-xs font-black text-white shadow-sm active:scale-95">
                       AI解读
@@ -287,38 +315,8 @@ export default function DashboardPage() {
                     <button type="button" className="rounded-full border border-blue-100 bg-white px-4 py-2 text-xs font-black text-blue-700 hover:bg-blue-50 active:scale-95">
                       收藏机会
                     </button>
-                    <Link href="/opportunities" className="rounded-full border border-blue-100 bg-white px-4 py-2 text-xs font-black text-slate-600 hover:bg-blue-50 active:scale-95">
-                      查看详情
-                    </Link>
                   </div>
                 </motion.article>
-              ))}
-            </div>
-          </section>
-
-          <section className="overflow-hidden rounded-[32px] border border-white/70 bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-500 p-6 text-white shadow-glow">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-sm font-black text-white/75">Opportunity Data Center</p>
-                <h2 className="mt-1 text-3xl font-black">成长机会数据中心</h2>
-              </div>
-              <p className="text-sm font-bold text-white/75">实时感知机会动态，辅助学生行动决策</p>
-            </div>
-            <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-3 2xl:grid-cols-6">
-              {opportunityStats.map(([label, value], index) => (
-                <motion.div
-                  key={label}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.04 }}
-                  className="rounded-[24px] border border-white/24 bg-white/16 p-5 shadow-xl backdrop-blur-xl"
-                >
-                  <p className="text-4xl font-black">
-                    <CountUp value={Number(value)} />
-                  </p>
-                  <p className="mt-2 text-sm font-bold text-white/78">{label}</p>
-                </motion.div>
               ))}
             </div>
           </section>
@@ -327,31 +325,31 @@ export default function DashboardPage() {
             <p className="text-sm font-black text-blue-600">Growth Loop Model</p>
             <h2 className="mt-1 text-3xl font-black text-slate-950">从发现机会到能力成长</h2>
             <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-600">
-              扬工智行不只是回答问题，而是帮助学生形成从目标设定、机会发现、实践参与到能力提升的成长闭环。
+              YPI 不只是回答问题，而是帮助学生形成从目标设定、机会发现、实践参与到能力提升的成长闭环。
             </p>
             <div className="mt-6 grid gap-3 md:grid-cols-5">
               {growthLoop.map((item, index) => {
                 const Icon = item.icon;
                 return (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
-                  className="relative rounded-[24px] border border-blue-100 bg-white/72 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-900/70"
-                >
-                  <div className="mb-4 grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-glow">
-                    <Icon className="size-5" />
-                  </div>
-                  <p className="text-base font-black text-slate-950">{item.title}</p>
-                  <p className="mt-2 text-xs leading-5 text-slate-500">{item.desc}</p>
-                  {index < growthLoop.length - 1 && (
-                    <span className="absolute -right-3 top-1/2 hidden -translate-y-1/2 text-xl font-black text-blue-400 md:block">
-                      →
-                    </span>
-                  )}
-                </motion.div>
+                  <motion.div
+                    key={item.title}
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.05 }}
+                    className="relative rounded-[24px] border border-blue-100 bg-white/72 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-900/70"
+                  >
+                    <div className="mb-4 grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-glow">
+                      <Icon className="size-5" />
+                    </div>
+                    <p className="text-base font-black text-slate-950 dark:text-slate-100">{item.title}</p>
+                    <p className="mt-2 text-xs leading-5 text-slate-500">{item.desc}</p>
+                    {index < growthLoop.length - 1 && (
+                      <span className="absolute -right-3 top-1/2 hidden -translate-y-1/2 text-xl font-black text-blue-400 md:block">
+                        ↓
+                      </span>
+                    )}
+                  </motion.div>
                 );
               })}
             </div>
@@ -360,8 +358,8 @@ export default function DashboardPage() {
           <section>
             <div className="mb-4 flex items-end justify-between gap-4">
               <div>
-                <p className="text-sm font-black text-blue-600">Campus Service Matrix</p>
-                <h2 className="mt-1 text-3xl font-black text-slate-950">八大服务入口</h2>
+                <p className="text-sm font-black text-blue-600">Platform Capability Matrix</p>
+                <h2 className="mt-1 text-3xl font-black text-slate-950">平台能力矩阵</h2>
               </div>
               <Link href="/about" className="hidden text-sm font-black text-blue-700 sm:inline-flex">
                 查看项目架构 →
@@ -388,7 +386,7 @@ export default function DashboardPage() {
                     <span className="mb-3 inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">
                       {card.tag}
                     </span>
-                    <h3 className="text-2xl font-black text-slate-950">{card.title}</h3>
+                    <h3 className="text-2xl font-black text-slate-950 dark:text-slate-100">{card.title}</h3>
                     <p className="mt-3 min-h-16 text-sm leading-7 text-slate-600">{card.desc}</p>
                     <Link
                       href={card.href}
@@ -405,14 +403,14 @@ export default function DashboardPage() {
 
           <section className="grid gap-5 xl:grid-cols-[1fr_380px]">
             <div className="premium-card p-6">
-              <p className="text-sm font-black text-blue-600">AI Driven Care Platform</p>
+              <p className="text-sm font-black text-blue-600">AI-Powered Student Growth Platform</p>
               <h2 className="mt-1 text-3xl font-black text-slate-950">
-                AI驱动的大学生成长机会与关怀服务平台
+                发现机会 · 规划成长 · 提供关怀
               </h2>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 {["成长机会发现", "通知智能解读", "学习资源推荐", "安全心理关怀"].map((item) => (
                   <div key={item} className="rounded-2xl border border-blue-100 bg-blue-50/45 p-4">
-                    <p className="font-black text-slate-950">{item}</p>
+                    <p className="font-black text-slate-950 dark:text-slate-100">{item}</p>
                     <p className="mt-2 text-sm leading-6 text-slate-600">
                       围绕成长、机会、陪伴构建，让校园信息从“能查询”升级为“能理解、能指导”。
                     </p>
@@ -434,5 +432,218 @@ export default function DashboardPage() {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+function OpportunityRadar() {
+  const [opportunities, setOpportunities] = useState<Opportunity[]>(defaultOpportunities);
+
+  useEffect(() => {
+    function refreshOpportunities() {
+      setOpportunities(getOpportunities());
+    }
+
+    refreshOpportunities();
+    window.addEventListener("focus", refreshOpportunities);
+    window.addEventListener("storage", refreshOpportunities);
+    return () => {
+      window.removeEventListener("focus", refreshOpportunities);
+      window.removeEventListener("storage", refreshOpportunities);
+    };
+  }, []);
+
+  const radarNodes = useMemo(() => getRadarNodes(opportunities), [opportunities]);
+  const [activeId, setActiveId] = useState("");
+  const activeNode = radarNodes.find((node) => node.opportunity.id === activeId) ?? radarNodes[0] ?? null;
+  const stats = useMemo(
+    () =>
+      [
+        ["今日发现机会", opportunities.filter((item) => isSameDay(item.createdAt)).length],
+        ["适合你的机会", opportunities.filter((item) => matchUserProfile(item) >= 70).length],
+        ["即将截止", opportunities.filter((item) => isDeadlineSoon(item.deadline)).length],
+        ["已完成", opportunities.filter((item) => item.followStatus === "已完成").length],
+      ] as const,
+    [opportunities],
+  );
+
+  return (
+    <motion.div
+      animate={{ y: [0, -12, 0] }}
+      transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut" }}
+      className="relative mx-auto w-full max-w-[600px] overflow-hidden rounded-[34px] border border-white/90 bg-gradient-to-br from-white via-blue-50 to-cyan-50 p-5 shadow-[0_34px_110px_rgba(37,99,235,0.22)]"
+    >
+      <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-cyan-300/35 blur-3xl" />
+      <div className="absolute -bottom-28 -left-20 h-80 w-80 rounded-full bg-blue-500/18 blur-3xl" />
+      <div className="relative z-10">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.26em] text-blue-600">YPI</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Discover Opportunities.</h2>
+            <p className="mt-1 text-sm font-black text-blue-700">Build Your Future. / 发现机会，塑造未来</p>
+          </div>
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">
+            实时扫描
+          </span>
+        </div>
+
+        <div className="md:hidden">
+          <OpportunityPulseCard stats={stats} />
+        </div>
+
+        <div className="hidden md:block">
+          <div className="relative mx-auto mt-8 aspect-square max-w-[430px] rounded-full border border-cyan-200/70 bg-gradient-to-br from-slate-950 via-blue-950 to-cyan-950 p-7 shadow-[inset_0_0_56px_rgba(34,211,238,0.22)]">
+            <div className="absolute inset-6 rounded-full border border-cyan-300/18" />
+            <div className="absolute inset-16 rounded-full border border-cyan-300/18" />
+            <div className="absolute inset-[34%] rounded-full border border-cyan-300/18" />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+              className="absolute inset-6 rounded-full bg-[conic-gradient(from_0deg,rgba(45,212,191,0.42),rgba(59,130,246,0.18),rgba(255,255,255,0.02)_25%,transparent_38%,transparent)]"
+            />
+            <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-cyan-300/12" />
+            <div className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-cyan-300/12" />
+
+            {radarNodes.map((node, index) => {
+              const opportunity = node.opportunity;
+              const angle = (index / radarNodes.length) * Math.PI * 2 - Math.PI / 2;
+              const radius = 41;
+              const x = 50 + Math.cos(angle) * radius;
+              const y = 50 + Math.sin(angle) * radius;
+              const statusClass = getFollowStatusClass(opportunity.followStatus, node.isUrgent);
+
+              return (
+                <motion.button
+                  key={opportunity.id}
+                  type="button"
+                  onClick={() => setActiveId(opportunity.id)}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: opportunity.followStatus === "未关注" ? [1, 1.05, 1] : 1 }}
+                  transition={{ delay: index * 0.08, repeat: opportunity.followStatus === "未关注" ? Infinity : 0, duration: 1.8 }}
+                  className={`absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border px-3 py-1.5 text-[11px] font-black shadow-lg backdrop-blur transition hover:scale-110 active:scale-95 ${statusClass}`}
+                  style={{ left: `${x}%`, top: `${y}%` }}
+                >
+                  <span className="mr-1 inline-block size-1.5 rounded-full bg-current align-middle opacity-70" />
+                  {opportunity.title}
+                </motion.button>
+              );
+            })}
+
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((dot) => (
+              <motion.span
+                key={dot}
+                animate={{ opacity: [0.25, 0.85, 0.25], scale: [1, 1.28, 1] }}
+                transition={{ delay: dot * 0.18, repeat: Infinity, duration: 2.6 }}
+                className="absolute size-1.5 rounded-full bg-cyan-200 shadow-[0_0_14px_rgba(103,232,249,0.78)]"
+                style={{
+                  left: `${18 + ((dot * 17) % 64)}%`,
+                  top: `${20 + ((dot * 23) % 58)}%`,
+                }}
+              />
+            ))}
+
+            <div className="absolute left-1/2 top-1/2 z-30 grid size-28 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-cyan-200/50 bg-white/94 text-center shadow-[0_0_46px_rgba(34,211,238,0.42)] backdrop-blur-xl">
+              <div>
+                <p className="text-xl leading-none">👤</p>
+                <p className="mt-1 text-3xl font-black text-blue-700">YPI</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.12em] text-slate-500">AI Opportunity Engine</p>
+              </div>
+            </div>
+          </div>
+
+          {activeNode && (
+            <div className="mt-5 rounded-[26px] border border-blue-100 bg-white/84 p-4 shadow-sm backdrop-blur-xl">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-black text-white">
+                      {activeNode.opportunity.category}
+                    </span>
+                    <span className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-black text-cyan-700">
+                      {activeNode.opportunity.followStatus}
+                    </span>
+                  </div>
+                  <h3 className="mt-3 text-xl font-black text-slate-950">{activeNode.opportunity.title}</h3>
+                  <p className="mt-2 text-sm font-bold text-slate-500">
+                    {activeNode.opportunity.deadline || "以通知为准"} · 推荐指数 {stars(activeNode.opportunity.recommendLevel)}
+                  </p>
+                  <p className="mt-2 rounded-2xl bg-cyan-50 px-3 py-2 text-xs font-black text-cyan-700">
+                    成长价值：{activeNode.opportunity.growthValues.slice(0, 3).join(" / ") || "成长经历 / 能力沉淀"}
+                  </p>
+                  <p className="mt-2 rounded-2xl bg-blue-50 px-3 py-2 text-xs font-bold leading-5 text-blue-700">
+                    推荐理由：{activeNode.reason}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Link href="/opportunities#hot-opportunities" className="rounded-full bg-blue-600 px-4 py-2 text-xs font-black text-white shadow-sm active:scale-95">
+                    查看详情
+                  </Link>
+                  <Link href="/opportunities" className="rounded-full border border-blue-100 bg-white px-4 py-2 text-xs font-black text-blue-700 hover:bg-blue-50 active:scale-95">
+                    前往机会中心
+                  </Link>
+                  <Link href="/opportunities#ai-interpret" className="rounded-full border border-cyan-100 bg-cyan-50 px-4 py-2 text-xs font-black text-cyan-700 hover:bg-cyan-100 active:scale-95">
+                    AI解读
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-6 hidden gap-3 sm:grid-cols-4 md:grid">
+          {stats.map(([label, value]) => (
+            <div key={label} className="rounded-[22px] border border-blue-100 bg-white/78 p-4 text-center shadow-sm backdrop-blur-xl">
+              <p className="text-3xl font-black text-blue-700">
+                <CountUp value={value} />
+              </p>
+              <p className="mt-1 text-xs font-black text-slate-500">{label}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5 flex items-center justify-center gap-1 text-xs font-black text-blue-700">
+          <span>AI 正在分析你的成长机会</span>
+          <motion.span animate={{ opacity: [0.25, 1, 0.25] }} transition={{ repeat: Infinity, duration: 1.2 }}>●</motion.span>
+          <motion.span animate={{ opacity: [0.25, 1, 0.25] }} transition={{ repeat: Infinity, duration: 1.2, delay: 0.18 }}>●</motion.span>
+          <motion.span animate={{ opacity: [0.25, 1, 0.25] }} transition={{ repeat: Infinity, duration: 1.2, delay: 0.36 }}>●</motion.span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function OpportunityPulseCard({ stats }: { stats: ReadonlyArray<readonly [string, number]> }) {
+  return (
+    <div className="mt-6 rounded-[28px] border border-blue-100 bg-white/82 p-5 shadow-xl backdrop-blur-xl">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-600">Opportunity Pulse</p>
+          <h3 className="mt-2 text-2xl font-black text-slate-950">成长机会脉冲</h3>
+        </div>
+        <motion.span
+          animate={{ scale: [1, 1.12, 1], opacity: [0.72, 1, 0.72] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="grid size-12 place-items-center rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 text-xl font-black text-white shadow-glow"
+        >
+          YPI
+        </motion.span>
+      </div>
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        {stats.map(([label, value]) => (
+          <div key={label} className="rounded-[20px] bg-blue-50/80 p-4">
+            <p className="text-2xl font-black text-blue-700">
+              <CountUp value={value} />
+            </p>
+            <p className="mt-1 text-xs font-black text-slate-500">{label}</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-5 h-2 overflow-hidden rounded-full bg-blue-50">
+        <motion.div
+          animate={{ x: ["-30%", "115%"] }}
+          transition={{ repeat: Infinity, duration: 2.8, ease: "easeInOut" }}
+          className="h-full w-1/2 rounded-full bg-gradient-to-r from-blue-600 to-cyan-400"
+        />
+      </div>
+    </div>
   );
 }
