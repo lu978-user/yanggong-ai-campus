@@ -61,10 +61,10 @@ const footerGroups: FooterGroup[] = [
 export function SiteFooter() {
   return (
     <footer className="px-4 pb-24 pt-8 sm:px-6 lg:px-8 lg:pb-10">
-      <section className="mx-auto max-w-[1800px] overflow-hidden rounded-[32px] border border-white/70 bg-white/72 p-6 shadow-card-light backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/70 dark:bg-slate-900/70 sm:p-8">
-        <div className="mb-8 grid gap-5 rounded-[28px] border border-blue-100 bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-500 p-6 text-white shadow-glow md:grid-cols-[1fr_auto] md:items-center">
+      <section className="mx-auto max-w-[1800px] overflow-hidden rounded-[32px] border border-white/70 bg-white/70 p-6 shadow-card-light backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/70 dark:bg-slate-900/70 sm:p-8">
+        <div className="mb-8 grid gap-5 rounded-[28px] border border-slate-200/70 bg-slate-950 p-6 text-white shadow-[0_18px_54px_rgba(15,23,42,0.16)] md:grid-cols-[1fr_auto] md:items-center dark:border-slate-700">
           <div>
-            <p className="text-sm font-black text-white/75">Growth Opportunity CTA</p>
+            <p className="text-sm font-black uppercase tracking-[0.22em] text-cyan-200/80">Growth Opportunity CTA</p>
             <h2 className="mt-2 text-3xl font-black tracking-normal sm:text-4xl">
               每一个机会，都可能改变未来。
             </h2>
@@ -75,14 +75,14 @@ export function SiteFooter() {
           <div className="flex flex-wrap gap-3">
             <Link
               href="/opportunities"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-black text-blue-700 shadow-xl transition hover:-translate-y-0.5 active:scale-95"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-xl transition hover:-translate-y-0.5 active:scale-95"
             >
               进入成长机会中心
               <ArrowRight className="size-4" />
             </Link>
             <Link
               href="/growth"
-              className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/14 px-5 py-3 text-sm font-black text-white backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/22 active:scale-95"
+              className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-5 py-3 text-sm font-black text-white backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/18 active:scale-95"
             >
               开始成长规划
               <ArrowRight className="size-4" />
@@ -93,7 +93,7 @@ export function SiteFooter() {
         <p className="text-sm font-black text-blue-600">友情链接</p>
         <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
           {footerGroups.map((group) => (
-            <div key={group.title} className="rounded-[24px] border border-blue-100/70 bg-white/58 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-200 hover:shadow-xl dark:border-slate-700/70 dark:bg-slate-950/35">
+            <div key={group.title} className="rounded-[24px] border border-slate-200/70 bg-white/54 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl dark:border-slate-700/70 dark:bg-slate-950/35">
               <h3 className="text-base font-black text-slate-950 dark:text-slate-100">{group.title}</h3>
               <div className="mt-4 grid gap-2">
                 {group.links.map((link) =>

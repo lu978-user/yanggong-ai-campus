@@ -10,6 +10,16 @@
   --muted-foreground: 220 12% 42%;
   --primary: 222 92% 56%;
   --primary-foreground: 0 0% 100%;
+  --ypi-navy: #0f172a;
+  --ypi-blue: #1d4ed8;
+  --ypi-tech-blue: #2563eb;
+  --ypi-cyan: #06b6d4;
+  --ypi-surface: rgba(255, 255, 255, 0.82);
+  --ypi-radius-card: 24px;
+  --ypi-radius-panel: 32px;
+  --ypi-radius-hero: 40px;
+  --ypi-shadow-soft: 0 18px 60px rgba(15, 23, 42, 0.08);
+  --ypi-shadow-elevated: 0 34px 110px rgba(29, 78, 216, 0.14);
 }
 
 .dark {
@@ -43,14 +53,82 @@ body {
   margin: 0;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 8% 8%, rgba(59, 130, 246, 0.16), transparent 28%),
-    radial-gradient(circle at 86% 12%, rgba(45, 212, 191, 0.16), transparent 30%),
-    radial-gradient(circle at 55% 85%, rgba(147, 197, 253, 0.2), transparent 34%),
-    linear-gradient(135deg, #eef5ff 0%, #f7fbff 42%, #e9f1f8 100%);
+    radial-gradient(circle at 8% 8%, rgba(37, 99, 235, 0.1), transparent 28%),
+    radial-gradient(circle at 86% 12%, rgba(6, 182, 212, 0.1), transparent 30%),
+    linear-gradient(135deg, #f8fafc 0%, #f7fbff 52%, #edf4fb 100%);
   color: hsl(var(--foreground));
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+}
+
+.ypi-section {
+  padding-block: clamp(56px, 8vw, 112px);
+}
+
+.ypi-kicker {
+  color: var(--ypi-tech-blue);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.ypi-section-title {
+  max-width: 980px;
+  color: #0f172a;
+  font-size: clamp(2.2rem, 5vw, 5.6rem);
+  font-weight: 950;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.ypi-soft-card {
+  border: 1px solid rgba(226, 232, 240, 0.78);
+  border-radius: var(--ypi-radius-card);
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: var(--ypi-shadow-soft);
+  backdrop-filter: blur(18px);
+  transition:
+    transform 520ms ease,
+    border-color 520ms ease,
+    box-shadow 520ms ease,
+    background-color 520ms ease,
+    color 300ms ease;
+}
+
+.ypi-soft-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(37, 99, 235, 0.22);
+  box-shadow: 0 24px 76px rgba(15, 23, 42, 0.12);
+}
+
+.ypi-elevated {
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(248, 250, 252, 0.62));
+  box-shadow: var(--ypi-shadow-elevated);
+  backdrop-filter: blur(24px);
+}
+
+.dark .ypi-section-title {
+  color: #f8fafc;
+}
+
+.dark .ypi-soft-card {
+  border-color: rgba(51, 65, 85, 0.76);
+  background: rgba(15, 23, 42, 0.64);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.3);
+}
+
+.dark .ypi-soft-card:hover {
+  border-color: rgba(6, 182, 212, 0.26);
+  box-shadow: 0 28px 86px rgba(0, 0, 0, 0.38);
+}
+
+.dark .ypi-elevated {
+  border-color: rgba(51, 65, 85, 0.78);
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.82), rgba(30, 41, 59, 0.58));
+  box-shadow: 0 34px 110px rgba(0, 0, 0, 0.34);
 }
 
 @media (pointer: fine) and (min-width: 768px) {
