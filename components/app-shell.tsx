@@ -16,14 +16,14 @@ const navGroups = [
     title: "主平台",
     items: [
       { href: "/", label: "首页", icon: "🏠" },
-      { href: "/map", label: "校园导航", icon: "📍" },
+      { href: "/map", label: "校园导航", icon: "🗺️" },
       { href: "/chat", label: "AI成长导师", icon: "🤖" },
     ],
   },
   {
     title: "学习成长",
     items: [
-      { href: "/growth", label: "成长规划", icon: "🎓" },
+      { href: "/growth", label: "成长规划", icon: "📊" },
       { href: "/resources", label: "学习资源", icon: "📚" },
     ],
   },
@@ -31,16 +31,16 @@ const navGroups = [
     title: "校园服务",
     items: [
       { href: "/life", label: "校园生活", icon: "🍜" },
-      { href: "/opportunities", label: "成长机会", icon: "📢" },
-      { href: "/affairs", label: "学生事务", icon: "📋" },
+      { href: "/opportunities", label: "成长机会", icon: "🌱" },
+      { href: "/affairs", label: "学生事务", icon: "🧾" },
     ],
   },
   {
     title: "公益关怀",
     items: [
-      { href: "/safety", label: "安全教育", icon: "🛡" },
-      { href: "/care", label: "心理关怀", icon: "💗" },
-      { href: "/about", label: "关于我们", icon: "ℹ" },
+      { href: "/safety", label: "安全教育", icon: "🛡️" },
+      { href: "/care", label: "心理关怀", icon: "🫶" },
+      { href: "/about", label: "关于我们", icon: "✨" },
     ],
   },
 ];
@@ -54,10 +54,10 @@ const utilityItems = [
 
 const mobileItems = [
   { href: "/", label: "首页", icon: "🏠" },
-  { href: "/map", label: "导航", icon: "📍" },
+  { href: "/opportunities", label: "机会", icon: "🌱" },
   { href: "/chat", label: "AI", icon: "🤖" },
-  { href: "/opportunities", label: "机会", icon: "📢" },
-  { href: "/care", label: "关怀", icon: "💗" },
+  { href: "/map", label: "地图", icon: "🗺️" },
+  { href: "/growth", label: "检测", icon: "📊" },
 ];
 
 type ThemeMode = "light" | "dark";
@@ -96,7 +96,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <main className="min-h-screen overflow-x-hidden bg-page text-foreground transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
       <RevealAuto />
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[240px] overflow-y-auto border-r border-white/70 bg-white/72 px-4 py-5 shadow-card-light backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-950/90 lg:block">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[240px] overflow-y-auto border-r border-[rgba(15,23,42,0.08)] bg-white/72 px-4 py-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-950/90 lg:block">
         <SidebarContent
           isActive={isActive}
           openGroups={openGroups}
@@ -174,15 +174,15 @@ export function AppShell({ children }: { children: ReactNode }) {
         <SiteFooter />
       </div>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-blue-100/80 bg-white/92 px-2 py-2 backdrop-blur-xl transition-colors duration-300 dark:border-slate-700/70 dark:bg-slate-950/92 lg:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-blue-100/80 bg-white/92 px-2 py-2 shadow-[0_-12px_36px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-colors duration-300 dark:border-slate-700/70 dark:bg-slate-950/92 lg:hidden">
         <div className="grid grid-cols-5 gap-1">
           {mobileItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center rounded-2xl px-2 py-1.5 text-[11px] font-black text-slate-500 transition-all duration-300 hover:-translate-y-0.5 dark:text-slate-300",
-                isActive(item.href) && "bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-glow",
+                "flex flex-col items-center rounded-2xl px-2 py-1.5 text-[11px] font-black text-slate-500 transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-slate-800",
+                isActive(item.href) && "border border-blue-600/[0.14] bg-blue-600/10 text-blue-700 shadow-sm dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-200",
               )}
             >
               <span className="text-base">{item.icon}</span>
@@ -237,7 +237,7 @@ function SidebarContent({
                     [group.title]: !current[group.title],
                   }))
                 }
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-black text-slate-400 transition hover:bg-blue-50 hover:text-blue-700 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-blue-300"
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-black text-slate-400 transition hover:bg-blue-600/[0.08] hover:text-blue-700 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-blue-300"
               >
                 {group.title}
                 <ChevronDown className={cn("size-4 transition", open && "rotate-180 text-blue-500")} />
@@ -255,12 +255,12 @@ function SidebarContent({
                       href={item.href}
                       onClick={onNavigate}
                       className={cn(
-                        "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-600 transition-all duration-300 hover:translate-x-1 hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300",
+                        "group flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-bold text-slate-600 transition-all duration-300 hover:translate-x-1 hover:border-blue-600/10 hover:bg-blue-600/[0.08] hover:text-blue-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300",
                         isActive(item.href) &&
-                          "bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-glow hover:text-white",
+                          "border-blue-600/[0.14] bg-blue-600/10 text-blue-700 shadow-sm hover:text-blue-700 dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-200",
                       )}
                     >
-                      <span className="w-5 text-center transition-transform duration-300 group-hover:scale-110">
+                      <span className="w-5 text-center text-[17px] leading-none opacity-90 transition-transform duration-300 group-hover:scale-[1.06]">
                         {item.icon}
                       </span>
                       {item.label}
@@ -293,9 +293,9 @@ function SidebarContent({
                 key={item.label}
                 href={item.href}
                 onClick={onNavigate}
-                className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-600 transition-all duration-300 hover:translate-x-1 hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300"
+                className="group flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-bold text-slate-600 transition-all duration-300 hover:translate-x-1 hover:border-blue-600/10 hover:bg-blue-600/[0.08] hover:text-blue-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300"
               >
-                <span className="w-5 text-center transition-transform duration-300 group-hover:scale-110">
+                <span className="w-5 text-center text-[17px] leading-none opacity-90 transition-transform duration-300 group-hover:scale-[1.06]">
                   {item.icon}
                 </span>
                 {item.label}

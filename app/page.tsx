@@ -58,8 +58,10 @@ const heroActionCards = [
     action: "进入机会中心",
     href: "/opportunities",
     icon: Trophy,
-    className: "bg-white/94 text-slate-950 sm:col-span-7 sm:translate-x-8",
-    iconClassName: "bg-amber-100 text-amber-700",
+    className: "bg-white/95 text-slate-950 sm:col-span-7 sm:translate-x-8",
+    iconClassName: "bg-orange-100 text-[#D97706]",
+    accentClassName: "text-[#D97706]",
+    tone: "light",
   },
   {
     title: "AI 成长导师",
@@ -67,8 +69,10 @@ const heroActionCards = [
     action: "问问 AI",
     href: "/chat",
     icon: MessageCircle,
-    className: "bg-blue-50/94 text-slate-950 sm:col-span-6 sm:col-start-6 sm:-translate-y-5",
-    iconClassName: "bg-blue-600 text-white",
+    className: "bg-[#F8FBFF]/95 text-slate-950 sm:col-span-6 sm:col-start-6 sm:-translate-y-5",
+    iconClassName: "bg-blue-100 text-[#2563EB]",
+    accentClassName: "text-[#2563EB]",
+    tone: "light",
   },
   {
     title: "校园地图",
@@ -76,8 +80,10 @@ const heroActionCards = [
     action: "打开地图",
     href: "/map",
     icon: MapPinned,
-    className: "bg-teal-50/92 text-slate-950 sm:col-span-6 sm:translate-x-2 sm:-translate-y-2",
-    iconClassName: "bg-teal-100 text-teal-700",
+    className: "bg-[#F0FDFA]/95 text-slate-950 sm:col-span-6 sm:translate-x-2 sm:-translate-y-2",
+    iconClassName: "bg-teal-100 text-[#0F766E]",
+    accentClassName: "text-[#0F766E]",
+    tone: "light",
   },
   {
     title: "成长检测",
@@ -85,8 +91,10 @@ const heroActionCards = [
     action: "开始检测",
     href: "/growth",
     icon: BrainCircuit,
-    className: "bg-[#FFF7E6]/94 text-slate-950 sm:col-span-7 sm:col-start-5 sm:-translate-y-8",
-    iconClassName: "bg-amber-100 text-amber-700",
+    className: "bg-[#FFF7E6]/95 text-slate-950 sm:col-span-7 sm:col-start-5 sm:-translate-y-8",
+    iconClassName: "bg-amber-100 text-[#D97706]",
+    accentClassName: "text-[#D97706]",
+    tone: "light",
   },
 ];
 
@@ -217,44 +225,64 @@ function ScrollProgress({ activeId }: { activeId: string }) {
 
 function HeroScreen() {
   return (
-    <Screen id="hero" className="bg-[radial-gradient(circle_at_78%_20%,rgba(45,212,191,0.16),transparent_30%),radial-gradient(circle_at_18%_82%,rgba(251,191,36,0.16),transparent_28%),linear-gradient(135deg,#0F2A5F_0%,#123A7A_38%,#3B82F6_68%,#F8FAFC_100%)] text-white">
-      <WhiteGooseParticles />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent via-[#eaf4ff]/35 to-[#f8fafc] dark:to-slate-950" />
-      <div className="grid gap-10 lg:grid-cols-[1.04fr_0.96fr] lg:items-center">
+    <Screen id="hero" className="bg-[#FFFDF7] text-slate-950">
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(circle at 82% 16%, rgba(37, 99, 235, 0.10), transparent 30%), radial-gradient(circle at 18% 18%, rgba(217, 119, 6, 0.08), transparent 28%), radial-gradient(circle at 88% 78%, rgba(15, 118, 110, 0.08), transparent 32%), linear-gradient(135deg, #FFFDF7 0%, #F8FAFC 42%, #EAF4FF 100%)",
+        }}
+      />
+      <div className="pointer-events-none absolute -left-24 -top-36 hidden h-[520px] w-[520px] rounded-full border border-[#D97706]/15 lg:block" />
+      <div className="pointer-events-none absolute -right-36 -bottom-44 hidden h-[620px] w-[620px] rounded-full border border-blue-500/10 lg:block" />
+      <div className="pointer-events-none absolute left-[44%] top-4 hidden h-56 w-80 -translate-x-1/2 bg-[radial-gradient(#2563EB_1px,transparent_1px)] bg-[length:18px_18px] opacity-[0.08] lg:block" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-52 overflow-hidden text-[#D97706]/20">
+        <svg className="absolute bottom-0 left-0 h-full w-full" viewBox="0 0 1440 220" fill="none" aria-hidden="true" preserveAspectRatio="none">
+          <path d="M0 156C171 112 303 128 458 151C640 178 810 188 1001 137C1165 93 1291 78 1440 104" stroke="currentColor" strokeWidth="1.2" />
+          <path d="M0 190C165 144 329 158 490 179C672 203 817 197 998 159C1198 117 1324 130 1440 146" stroke="#2563EB" strokeOpacity="0.12" strokeWidth="1.2" />
+          <path d="M210 160H274V126H324V160H394V116H458V160H530V132H586V160H664" stroke="currentColor" strokeWidth="1" />
+          <path d="M235 126L299 96L368 126M416 116L489 84L560 132" stroke="currentColor" strokeWidth="1" />
+          <path d="M238 160V138M272 160V138M310 160V138M438 160V130M478 160V126M520 160V136" stroke="currentColor" strokeWidth="0.9" />
+          <path d="M720 164C780 132 830 128 876 158C919 186 970 182 1018 150" stroke="#2563EB" strokeOpacity="0.12" strokeWidth="1" />
+        </svg>
+      </div>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-white/80 dark:to-slate-950" />
+      <div className="relative z-10 grid gap-10 lg:grid-cols-[1.04fr_0.96fr] lg:items-center">
         <div>
-          <p className="inline-flex rounded-full border border-white/22 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-blue-100 backdrop-blur">
+          <p className="inline-flex rounded-full border border-blue-600/20 bg-white/70 px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-[#2563EB] shadow-sm backdrop-blur">
             YPI · AI Campus Growth Platform
           </p>
-          <h1 className="mt-8 max-w-4xl text-5xl font-black leading-tight tracking-tight sm:text-6xl xl:text-7xl">
+          <h1 className="mt-8 max-w-4xl text-5xl font-black leading-tight tracking-tight text-[#0F172A] sm:text-6xl xl:text-7xl">
             扬工智行
-            <span className="block text-[#EAF4FF]">AI 校园公益服务平台</span>
+            <span className="block text-[#2563EB]">AI 校园公益服务平台</span>
           </h1>
-          <p className="mt-6 text-2xl font-black text-white sm:text-3xl">
+          <p className="mt-6 text-2xl font-black text-[#0F172A] sm:text-3xl">
             让每一位学生不错过成长机会
           </p>
-          <p className="mt-5 max-w-3xl text-base leading-8 text-white/74 sm:text-lg">
+          <p className="mt-5 max-w-3xl text-base leading-8 text-[#475569] sm:text-lg">
             面向扬州工业职业技术学院学生，连接校园服务、成长机会、AI 规划与安全关怀。它不是一个通用 AI 助手，而是扬工院学生自己的成长机会系统。
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link href="/opportunities" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FFF7E6] px-6 py-3 text-sm font-black text-[#0F2A5F] shadow-[0_14px_34px_rgba(15,42,95,0.18)] transition hover:-translate-y-1 hover:bg-[#FDE68A] active:scale-95">
+            <Link href="/opportunities" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2563EB] px-6 py-3 text-sm font-black text-white shadow-[0_14px_34px_rgba(37,99,235,0.22)] transition hover:-translate-y-1 hover:bg-[#1D4ED8] active:scale-95">
               进入成长机会中心
               <ArrowRight className="size-4" />
             </Link>
-            <Link href="/growth" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/36 bg-white/12 px-6 py-3 text-sm font-black text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur transition hover:-translate-y-1 hover:bg-white/18 active:scale-95">
+            <Link href="/growth" className="inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(15,23,42,0.10)] bg-white/82 px-6 py-3 text-sm font-black text-[#0F172A] shadow-sm backdrop-blur transition hover:-translate-y-1 hover:bg-[#EFF6FF] active:scale-95">
               开始成长检测
             </Link>
           </div>
-          <div className="mt-5 flex flex-wrap gap-4 text-sm font-black text-[#FFF7E6]/90">
-            <Link href="/chat" className="hover:text-white">AI 成长导师 →</Link>
-            <Link href="/map" className="hover:text-white">校园地图导览 →</Link>
+          <div className="mt-5 flex flex-wrap gap-4 text-sm font-black text-[#475569]">
+            <Link href="/chat" className="hover:text-[#2563EB]">AI 成长导师 →</Link>
+            <Link href="/map" className="hover:text-[#2563EB]">校园地图导览 →</Link>
           </div>
         </div>
 
         <div className="relative">
-          <div className="pointer-events-none absolute -inset-6 rounded-[44px] bg-[radial-gradient(circle_at_55%_32%,rgba(255,247,230,0.18),transparent_42%)] blur-xl" />
+          <div className="pointer-events-none absolute -inset-6 rounded-[44px] bg-[radial-gradient(circle_at_55%_32%,rgba(37,99,235,0.10),transparent_42%)] blur-xl" />
           <div className="relative z-10 grid gap-3 sm:grid-cols-12 sm:gap-0">
             {heroActionCards.map((card, index) => {
               const Icon = card.icon;
+              const isDarkCard = card.tone === "dark";
               return (
                 <motion.div
                   key={card.href}
@@ -265,19 +293,19 @@ function HeroScreen() {
                 >
                   <Link
                     href={card.href}
-                    className="group block rounded-[30px] border border-white/42 p-5 shadow-[0_18px_44px_rgba(15,42,95,0.12)] backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:border-white/70 hover:shadow-[0_24px_60px_rgba(15,42,95,0.18)] active:scale-[0.98] sm:p-6"
+                    className="group block rounded-[30px] border border-[rgba(15,23,42,0.08)] p-5 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:border-blue-600/20 hover:shadow-[0_28px_78px_rgba(15,23,42,0.12)] active:scale-[0.98] sm:p-6"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <span className={`grid size-11 place-items-center rounded-2xl ${card.iconClassName}`}>
                         <Icon className="size-5" />
                       </span>
-                      <ArrowRight className="mt-2 size-5 opacity-70 transition-transform duration-300 group-hover:translate-x-1" />
+                      <ArrowRight className={`mt-2 size-5 transition-transform duration-300 group-hover:translate-x-1 ${isDarkCard ? "text-white/80" : "text-[#0F172A]"}`} />
                     </div>
-                    <h2 className="mt-5 text-2xl font-black tracking-tight">{card.title}</h2>
-                    <p className={`mt-3 text-sm leading-6 ${card.className.includes("text-white") ? "text-white/74" : "text-[#475569]"}`}>
+                    <h2 className={`mt-5 text-2xl font-black tracking-tight ${isDarkCard ? "text-white" : "text-slate-950"}`}>{card.title}</h2>
+                    <p className={`mt-3 text-sm leading-6 ${isDarkCard ? "text-white/80" : "text-slate-600"}`}>
                       {card.description}
                     </p>
-                    <span className={`mt-5 inline-flex text-sm font-black ${card.className.includes("text-white") ? "text-blue-100" : "text-blue-700"}`}>
+                    <span className={`mt-5 inline-flex text-sm font-black ${isDarkCard ? "text-[#FFF7E6]" : card.accentClassName}`}>
                       {card.action} →
                     </span>
                   </Link>
@@ -287,7 +315,7 @@ function HeroScreen() {
           </div>
         </div>
       </div>
-      <div className="ypi-scroll-hint absolute bottom-6 left-1/2 hidden -translate-x-1/2 items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-white/82 lg:flex">
+      <div className="ypi-scroll-hint absolute bottom-6 left-1/2 hidden -translate-x-1/2 items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-[#64748B] lg:flex">
         <ArrowDown className="size-4 animate-bounce" />
         向下滚动，查看扬工智行如何服务学生成长
       </div>
